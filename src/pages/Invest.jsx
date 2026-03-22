@@ -32,9 +32,9 @@ const Invest = () => {
   ];
 
   const investmentPlans = [
-    { period: '6', label: '6 Horas', return: 17, icon: Clock },
-    { period: '8', label: '8 Horas', return: 25, icon: TrendingUp },
-    { period: '24', label: '24 Horas', return: 50, icon: Award },
+    { period: '6', label: '6 Horas', return: 30, icon: Clock },
+    { period: '8', label: '8 Horas', return: 45, icon: TrendingUp },
+    { period: '24', label: '24 Horas', return: 60, icon: Award },
   ];
 
   const walletAddresses = {
