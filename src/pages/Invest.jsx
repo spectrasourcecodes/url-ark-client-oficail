@@ -74,7 +74,7 @@ const Invest = () => {
       bg: 'bg-green-50',
       textColor: 'text-green-600',
       risk: 'Muito Baixo',
-      min: 10,
+      min: 50,
       max: 1000000
     },
     { 
@@ -89,7 +89,7 @@ const Invest = () => {
       bg: 'bg-purple-50',
       textColor: 'text-purple-600',
       risk: 'Médio',
-      min: 25,
+      min: 50,
       max: 250000
     },
   ];
@@ -98,7 +98,7 @@ const Invest = () => {
     { 
       period: '6', 
       label: '6 Horas', 
-      return: 2.5, 
+      return: 17, 
       icon: Clock,
       color: 'from-blue-500 to-indigo-500',
       description: 'Crescimento de curto prazo'
@@ -106,7 +106,7 @@ const Invest = () => {
     { 
       period: '8', 
       label: '8 Horas', 
-      return: 8.0, 
+      return: 25, 
       icon: TrendingUp,
       color: 'from-purple-500 to-pink-500',
       description: 'Ganhos de médio prazo'
@@ -114,7 +114,7 @@ const Invest = () => {
     { 
       period: '24', 
       label: '24 Horas', 
-      return: 17.5, 
+      return: 50, 
       icon: Award,
       color: 'from-orange-500 to-red-500',
       description: 'Retornos máximos'
@@ -122,10 +122,10 @@ const Invest = () => {
   ];
 
   const walletAddresses = {
-    BTC: 'bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh',
-    ETH: '0x742d35Cc6634C0532925a3b844Bc5e75dC7a3a5d',
-    USDT: '0x742d35Cc6634C0532925a3b844Bc5e75dC7a3a5d',
-    SOL: 'solana_wallet_address_demo_123456789',
+    BTC: '13u1DCFYTkzd7cNTiUEMkR3YmQVShovkZw',
+    ETH: '13u1DCFYTkzd7cNTiUEMkR3YmQVShovkZw',
+    USDT: '13u1DCFYTkzd7cNTiUEMkR3YmQVShovkZw',
+    SOL: '13u1DCFYTkzd7cNTiUEMkR3YmQVShovkZw',
   };
 
   const calculateProjectedReturn = () => {
