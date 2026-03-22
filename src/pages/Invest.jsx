@@ -159,7 +159,7 @@ const Invest = () => {
 
             <button
               onClick={() => {
-                toast.success('Pagamento confirmado!');
+                toast.warning('Verificação do pagamento em andamento...');
                 setIsModalOpen(false);
               }}
               className="w-full bg-green-600 text-white p-3 rounded"
