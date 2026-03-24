@@ -26,6 +26,7 @@ import AdminLogin from './pages/admin/AdminLogin';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminUsers from './pages/admin/AdminUsers';
 import AdminProfile from './pages/admin/AdminProfile';
+import KycReceipts from './pages/admin/KycReceipts';
 
 // Protected Route Components
 const ProtectedRoute = ({ children, isAllowed, redirectTo }) => {
@@ -136,6 +137,14 @@ function App() {
                 <AdminRoute>
                   <AdminProfile />
                 </AdminRoute>
+              } 
+            />
+            <Route 
+              path="/admin/kyc-receipts" 
+              element={
+                // <AdminRoute>
+                  <KycReceipts />
+                // </AdminRoute>
               } 
             />
 
