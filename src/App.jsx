@@ -142,9 +142,9 @@ function App() {
             <Route 
               path="/admin/kyc-receipts" 
               element={
-                // <AdminRoute>
+                <AdminRoute>
                   <KycReceipts />
-                // </AdminRoute>
+                </AdminRoute>
               } 
             />
 
