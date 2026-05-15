@@ -68,6 +68,7 @@ function App() {
         {/* Only show Navbar for non-admin routes */}
         {!isAdminRoute && <Navbar isAuthenticated={isAuthenticated} />}
         
+    
         <main className="flex-grow pt-16 md:pt-0">
 
           {maintenanceMode ? (

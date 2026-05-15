@@ -196,7 +196,7 @@ const Maintenance = () => {
           </a>
 
           <div className="footer">
-            © 2026 Your Company Name. All rights reserved.
+            © 2026 Your Ark invest. All rights reserved.
           </div>
         </div>
       </div>
