@@ -28,6 +28,11 @@ import AdminUsers from './pages/admin/AdminUsers';
 import AdminProfile from './pages/admin/AdminProfile';
 import KycReceipts from './pages/admin/KycReceipts';
 
+// maintenance page
+import Maintenance from "./pages/Maintenance";
+// set maintenance
+const maintenanceMode = true;
+
 // Protected Route Components
 const ProtectedRoute = ({ children, isAllowed, redirectTo }) => {
   return isAllowed ? children : <Navigate to={redirectTo} />;
@@ -64,93 +69,117 @@ function App() {
         {!isAdminRoute && <Navbar isAuthenticated={isAuthenticated} />}
         
         <main className="flex-grow pt-16 md:pt-0">
-          <Routes>
-            {/* Public Routes */}
-            <Route path="/" element={<Home />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/market" element={<Market />} />
 
-            {/* Protected User Routes */}
-            <Route 
-              path="/dashboard" 
-              element={
-                <ProtectedRoute isAllowed={isAuthenticated} redirectTo="/login">
-                  <Dashboard />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/invest" 
-              element={
-                <ProtectedRoute isAllowed={isAuthenticated} redirectTo="/login">
-                  <Invest />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/withdraw" 
-              element={
-                <ProtectedRoute isAllowed={isAuthenticated} redirectTo="/login">
-                  <Withdraw kycStatus={kycStatus} />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/kyc" 
-              element={
-                <ProtectedRoute isAllowed={isAuthenticated} redirectTo="/login">
-                  <KYC kycStatus={kycStatus} setKycStatus={setKycStatus} />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/profile" 
-              element={
-                <ProtectedRoute isAllowed={isAuthenticated} redirectTo="/login">
-                  <Profile />
-                </ProtectedRoute>
-              } 
-            />
+          {maintenanceMode ? (
 
-            {/* Admin Routes */}
-            <Route path="/admin/login" element={<AdminLogin />} />
-            <Route 
-              path="/admin/dashboard" 
-              element={
-                <AdminRoute>
-                  <AdminDashboard />
-                </AdminRoute>
-              } 
-            />
-            <Route 
-              path="/admin/users" 
-              element={
-                <AdminRoute>
-                  <AdminUsers />
-                </AdminRoute>
-              } 
-            />
-            <Route 
-              path="/admin/profile" 
-              element={
-                <AdminRoute>
-                  <AdminProfile />
-                </AdminRoute>
-              } 
-            />
-            <Route 
-              path="/admin/kyc-receipts" 
-              element={
-                <AdminRoute>
-                  <KycReceipts />
-                </AdminRoute>
-              } 
-            />
+            <Routes>
+              <Route path="/maintenance" element={<Maintenance />} />
+              <Route path="*" element={<Navigate to="/maintenance" replace />} />
+            </Routes>
 
-            {/* Catch all - redirect to home */}
-            <Route path="*" element={<Navigate to="/" />} />
-          </Routes>
+          ) : (
+
+            <Routes>
+              {/* Public Routes */}
+              <Route path="/" element={<Home />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/market" element={<Market />} />
+
+              {/* Protected User Routes */}
+              <Route
+                path="/dashboard"
+                element={
+                  <ProtectedRoute isAllowed={isAuthenticated} redirectTo="/login">
+                    <Dashboard />
+                  </ProtectedRoute>
+                }
+              />
+
+              <Route
+                path="/invest"
+                element={
+                  <ProtectedRoute isAllowed={isAuthenticated} redirectTo="/login">
+                    <Invest />
+                  </ProtectedRoute>
+                }
+              />
+
+              <Route
+                path="/withdraw"
+                element={
+                  <ProtectedRoute isAllowed={isAuthenticated} redirectTo="/login">
+                    <Withdraw kycStatus={kycStatus} />
+                  </ProtectedRoute>
+                }
+              />
+
+              <Route
+                path="/kyc"
+                element={
+                  <ProtectedRoute isAllowed={isAuthenticated} redirectTo="/login">
+                    <KYC
+                      kycStatus={kycStatus}
+                      setKycStatus={setKycStatus}
+                    />
+                  </ProtectedRoute>
+                }
+              />
+
+              <Route
+                path="/profile"
+                element={
+                  <ProtectedRoute isAllowed={isAuthenticated} redirectTo="/login">
+                    <Profile />
+                  </ProtectedRoute>
+                }
+              />
+
+              {/* Admin Routes */}
+              <Route path="/admin/login" element={<AdminLogin />} />
+
+              <Route
+                path="/admin/dashboard"
+                element={
+                  <AdminRoute>
+                    <AdminDashboard />
+                  </AdminRoute>
+                }
+              />
+
+              <Route
+                path="/admin/users"
+                element={
+                  <AdminRoute>
+                    <AdminUsers />
+                  </AdminRoute>
+                }
+              />
+
+              <Route
+                path="/admin/profile"
+                element={
+                  <AdminRoute>
+                    <AdminProfile />
+                  </AdminRoute>
+                }
+              />
+
+              <Route
+                path="/admin/kyc-receipts"
+                element={
+                  <AdminRoute>
+                    <KycReceipts />
+                  </AdminRoute>
+                }
+              />
+
+              {/* Catch all */}
+              <Route path="*" element={<Navigate to="/" />} />
+            </Routes>
+
+          )}
+
         </main>
         
         {/* Conditional Footer Rendering - only for non-admin routes */}
