@@ -31,7 +31,7 @@ import KycReceipts from './pages/admin/KycReceipts';
 // maintenance page
 import Maintenance from "./pages/Maintenance";
 // set maintenance
-const maintenanceMode = true;
+const maintenanceMode = false;
 
 // Protected Route Components
 const ProtectedRoute = ({ children, isAllowed, redirectTo }) => {
