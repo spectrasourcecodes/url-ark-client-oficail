@@ -23,7 +23,7 @@ const Invest = () => {
       symbol: 'R$',
       type: 'fiat',
       price: 1,
-      min: 500,
+      min: 200,
       apy: 5,
       icon: '🇧🇷',
     },

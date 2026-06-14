@@ -217,7 +217,7 @@ const KYC = ({ kycStatus, setKycStatus }) => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    CEP
+                    CPF
                   </label>
                   <input
                     type="text"
