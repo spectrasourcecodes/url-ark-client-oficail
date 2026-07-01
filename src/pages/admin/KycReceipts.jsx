@@ -250,13 +250,11 @@ const KycReceipts = () => {
         </div>
         <div class="declaration">
             <strong>📄 Declaração Oficial:</strong> A <strong>ARK Investment</strong> declara que recebeu o valor acima descrito referente à 
-            <strong>compra e ativação do código KYC</strong>, conforme especificado na fatura ${data.invoiceNumber}.
-            <br><br>
-            Este documento serve como <strong>comprovante oficial de quitação</strong>. Sua conta está totalmente desbloqueada para saques e operações.
+            <strong>Esta é sua confirmação oficial de pagamento. Sua conta está agora totalmente desbloqueada para saques e negociações. Compre o token pin para desbloquear todo o seu lucro.</strong>. Sua conta está totalmente desbloqueada para saques e operações.
         </div>
         <div class="signature">
             <div>Assinatura da Empresa<br><strong>ARK Investment</strong></div>
-            <div>Responsável Financeiro<br><strong>Dra. Camila Mendes</strong></div>
+            <div>Responsável Financeiro<br><strong>Cathie Wood</strong></div>
         </div>
         <div class="footer">
             © 2026 ARK Investment — Todos os direitos reservados.<br>
