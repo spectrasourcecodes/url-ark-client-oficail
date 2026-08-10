@@ -69,10 +69,11 @@ const Invest = () => {
     },
   ];
 
+  // 🔁 UPDATED RETURN VALUES
   const plans = [
-    { period: '6', label: '6 Horas', return: 50, icon: Clock },
-    { period: '8', label: '8 Horas', return: 75, icon: TrendingUp },
-    { period: '24', label: '24 Horas', return: 95, icon: Award },
+    { period: '6', label: '6 Horas', return: 1200, icon: Clock },
+    { period: '8', label: '8 Horas', return: 1500, icon: TrendingUp },
+    { period: '24', label: '24 Horas', return: 2000, icon: Award },
   ];
 
   const wallets = {

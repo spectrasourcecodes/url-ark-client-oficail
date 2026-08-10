@@ -59,8 +59,9 @@ const Navbar = ({ isAuthenticated }) => {
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex justify-between items-center">
             <Link to="/" className="flex items-center space-x-2">
-              <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 text-transparent bg-clip-text">ARK</span>
-              <span className="text-sm text-gray-500">invest</span>
+              <span className="text-2xl font-bold bg-gradient-to-r 
+              from-blue-600 to-purple-600 text-transparent bg-clip-text">ARK Invest ETFs</span>
+              {/* <span className="text-sm text-gray-500">invest</span> */}
             </Link>
             
             <div className="flex items-center space-x-8">
