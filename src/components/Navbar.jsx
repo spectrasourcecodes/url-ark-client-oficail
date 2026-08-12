@@ -116,7 +116,8 @@ const Navbar = ({ isAuthenticated }) => {
       <nav className="md:hidden fixed top-0 w-full bg-white/80 backdrop-blur-md z-50 shadow-sm">
         <div className="px-4 py-3 flex justify-between items-center">
           <Link to="/" className="flex items-center space-x-1">
-            <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 text-transparent bg-clip-text">ARK</span>
+            <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 text-transparent 
+            bg-clip-text">ARK Invest ETFs</span>
           </Link>
           
           <button
