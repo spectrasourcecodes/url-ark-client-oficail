@@ -21,7 +21,7 @@ const Navbar = ({ isAuthenticated }) => {
 
     // ✅ Support (Telegram)
     { 
-      path: 'https://t.me/GlobalARKsupport', 
+      path: 'https://wa.me/5597945391005', 
       label: 'Support', 
       icon: MessageCircle, 
       external: true 
@@ -35,7 +35,7 @@ const Navbar = ({ isAuthenticated }) => {
 
     // ✅ Support (Telegram)
     { 
-      path: 'https://t.me/GlobalARKsupport', 
+      path: 'https://wa.me/5597945391005', 
       label: 'Support', 
       icon: MessageCircle, 
       external: true 
