@@ -58,9 +58,9 @@ const KYC = () => {
         return;
       }
       
-      const validTypes = ['image/jpeg', 'image/png', 'image/jpg', 'application/pdf'];
+      const validTypes = ['image/jpeg', 'image/jpeg', 'image/jpg', 'application/pdf'];
       if (!validTypes.includes(file.type)) {
-        toast.error('Formato inválido. Use JPG, PNG ou PDF');
+        toast.error('Formato inválido. Use JPG, jpeg ou PDF');
         return;
       }
       
@@ -394,7 +394,7 @@ const KYC = () => {
                       )}
                     </span>
                     <span className="text-xs text-gray-400 mt-1">
-                      JPG, PNG ou PDF (máx. 5MB)
+                      JPG, jpeg ou PDF (máx. 5MB)
                     </span>
                   </label>
                 </div>

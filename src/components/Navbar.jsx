@@ -89,7 +89,7 @@ const Navbar = () => {
             {/* Logo + Title */}
             <Link to="/" className="flex items-center space-x-3">
               <img 
-                src="/icons/icon-72x72.png" 
+                src="/icons/icon-72x72.jpeg" 
                 alt="ARK Invest" 
                 className="w-10 h-10 object-contain"
               />
@@ -186,7 +186,7 @@ const Navbar = () => {
           {/* Left side - Logo + Title */}
           <Link to="/" className="flex items-center space-x-2">
             <img 
-              src="/icons/icon-72x72.png" 
+              src="/icons/icon-72x72.jpeg" 
               alt="ARK Invest" 
               className="w-8 h-8 object-contain"
             />

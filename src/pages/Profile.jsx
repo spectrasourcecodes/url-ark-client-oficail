@@ -226,7 +226,7 @@ const Profile = () => {
                       >
                         Alterar Avatar
                       </button>
-                      <p className="text-[10px] sm:text-xs text-gray-500 mt-1">JPG, PNG ou GIF (máx 2MB)</p>
+                      <p className="text-[10px] sm:text-xs text-gray-500 mt-1">JPG, jpeg ou GIF (máx 2MB)</p>
                     </div>
                   </div>
 
