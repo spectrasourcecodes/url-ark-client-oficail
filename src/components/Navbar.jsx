@@ -3,53 +3,81 @@ import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   Menu, X, Home, TrendingUp, Wallet, User, LogOut, 
-  CreditCard, LayoutDashboard, MessageCircle 
+  CreditCard, LayoutDashboard, MessageCircle, 
+  Bell, Settings, RefreshCw, Eye, EyeOff, Search
 } from 'lucide-react';
 import { toast } from 'react-toastify';
+import { useAuth } from '../context/AuthContext';
 
-const Navbar = ({ isAuthenticated }) => {
+const Navbar = () => {
   const navigate = useNavigate();
+  const { isAuthenticated, logout, user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
+  const [showBalance, setShowBalance] = useState(true);
   const location = useLocation();
 
+  // Check if current page is dashboard
+  const isDashboard = location.pathname === '/dashboard';
+
+  const supportLink = import.meta.env.VITE_SUPPORT_LINK
+
   const navLinks = isAuthenticated ? [
-    { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { path: '/market', label: 'Market', icon: TrendingUp },
-    { path: '/invest', label: 'Invest', icon: TrendingUp },
-    { path: '/withdraw', label: 'Withdraw', icon: Wallet },
-    { path: '/profile', label: 'Profile', icon: User },
-
-    // ✅ Support (Telegram)
+    { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, id: 'dashboard' },
+    { path: '/market', label: 'Market', icon: TrendingUp, id: 'market' },
+    { path: '/invest', label: 'Invest', icon: TrendingUp, id: 'invest' },
+    { path: '/withdraw', label: 'Withdraw', icon: Wallet, id: 'withdraw' },
+    { path: '/profile', label: 'Profile', icon: User, id: 'profile' },
     { 
-      path: 'https://wa.me/5597945391005', 
+      path: supportLink, 
       label: 'Support', 
       icon: MessageCircle, 
-      external: true 
+      external: true,
+      id: 'support'
     },
-
   ] : [
-    { path: '/', label: 'Home', icon: Home },
-    { path: '/market', label: 'Market', icon: TrendingUp },
-    { path: '/login', label: 'Login', icon: User },
-    { path: '/register', label: 'Register', icon: CreditCard },
-
-    // ✅ Support (Telegram)
+    { path: '/', label: 'Home', icon: Home, id: 'home' },
+    { path: '/market', label: 'Market', icon: TrendingUp, id: 'market' },
+    { path: '/login', label: 'Login', icon: User, id: 'login' },
+    { path: '/register', label: 'Register', icon: CreditCard, id: 'register' },
     { 
-      path: 'https://wa.me/5597945391005', 
+      path: supportLink, 
       label: 'Support', 
       icon: MessageCircle, 
-      external: true 
+      external: true,
+      id: 'support'
     },
   ];
 
   const handleLogout = async () => {
     try {
-      localStorage.removeItem("token");
+      logout();
       toast.success("Logout successful");
       navigate("/login");
     } catch (error) {
       toast.error(error.response?.data?.message || "Logout failed");
     }
+  };
+
+  // Format currency for balance display
+  const formatCurrency = (value) => {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+      minimumFractionDigits: 2,
+    }).format(value || 0);
+  };
+
+  // Get user initials for avatar
+  const getUserInitials = () => {
+    if (user?.fullName) {
+      return user.fullName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+    }
+    return 'U';
+  };
+
+  // Placeholder for search – you can replace with a modal or dropdown later
+  const handleSearch = () => {
+    toast.info('Função de busca em desenvolvimento');
   };
 
   return (
@@ -58,10 +86,19 @@ const Navbar = ({ isAuthenticated }) => {
       <nav className="fixed top-0 w-full bg-white/80 backdrop-blur-md z-50 shadow-sm hidden md:block">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex justify-between items-center">
-            <Link to="/" className="flex items-center space-x-2">
-              <span className="text-2xl font-bold bg-gradient-to-r 
-              from-blue-600 to-purple-600 text-transparent bg-clip-text">ARK Invest ETFs</span>
-              {/* <span className="text-sm text-gray-500">invest</span> */}
+            {/* Logo + Title */}
+            <Link to="/" className="flex items-center space-x-3">
+              <img 
+                src="/icons/icon-72x72.png" 
+                alt="ARK Invest" 
+                className="w-10 h-10 object-contain"
+              />
+              <div className="flex flex-col leading-tight">
+                <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 text-transparent bg-clip-text">
+                  ARK
+                </span>
+                <span className="text-xs text-gray-500 -mt-1">invest</span>
+              </div>
             </Link>
             
             <div className="flex items-center space-x-8">
@@ -71,7 +108,7 @@ const Navbar = ({ isAuthenticated }) => {
                 if (link.external) {
                   return (
                     <a
-                      key={link.path}
+                      key={link.id}
                       href={link.path}
                       target="_blank"
                       rel="noopener noreferrer"
@@ -85,7 +122,7 @@ const Navbar = ({ isAuthenticated }) => {
 
                 return (
                   <Link
-                    key={link.path}
+                    key={link.id}
                     to={link.path}
                     className={`flex items-center space-x-1 text-sm font-medium transition-colors
                       ${location.pathname === link.path 
@@ -99,45 +136,129 @@ const Navbar = ({ isAuthenticated }) => {
               })}
 
               {isAuthenticated && (
-                <button
-                  onClick={handleLogout}
-                  className="flex items-center space-x-1 text-sm font-medium text-gray-600 hover:text-red-600 transition-colors"
-                >
-                  <LogOut className="w-4 h-4" />
-                  <span>Logout</span>
-                </button>
+                <>
+                  {/* Search button */}
+                  <button 
+                    onClick={handleSearch}
+                    className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                    title="Buscar"
+                  >
+                    <Search className="w-5 h-5 text-gray-600" />
+                  </button>
+
+                  {/* Balance toggle on desktop */}
+                  {isDashboard && (
+                    <button 
+                      onClick={() => setShowBalance(!showBalance)}
+                      className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                      title={showBalance ? "Ocultar saldo" : "Mostrar saldo"}
+                    >
+                      {showBalance ? <Eye className="w-4 h-4 text-gray-600" /> : <EyeOff className="w-4 h-4 text-gray-600" />}
+                    </button>
+                  )}
+                  
+                  <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors relative">
+                    <Bell className="w-5 h-5 text-gray-600" />
+                    <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                  </button>
+                  
+                  <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                    <Settings className="w-5 h-5 text-gray-600" />
+                  </button>
+                  
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center space-x-1 text-sm font-medium text-gray-600 hover:text-red-600 transition-colors"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    <span>Logout</span>
+                  </button>
+                </>
               )}
             </div>
           </div>
         </div>
       </nav>
 
-      {/* Mobile Navbar */}
+      {/* Mobile Navbar - Always shows app name */}
       <nav className="md:hidden fixed top-0 w-full bg-white/80 backdrop-blur-md z-50 shadow-sm">
         <div className="px-4 py-3 flex justify-between items-center">
-          <Link to="/" className="flex items-center space-x-1">
-            <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 text-transparent 
-            bg-clip-text">ARK Invest ETFs</span>
+          {/* Left side - Logo + Title */}
+          <Link to="/" className="flex items-center space-x-2">
+            <img 
+              src="/icons/icon-72x72.png" 
+              alt="ARK Invest" 
+              className="w-8 h-8 object-contain"
+            />
+            <div className="flex flex-col leading-tight">
+              <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 text-transparent bg-clip-text">
+                ARK
+              </span>
+              <span className="text-[10px] text-gray-500 -mt-1">invest</span>
+            </div>
           </Link>
-          
-          <button
-            onClick={() => setIsOpen(!isOpen)}
-            className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
-          >
-            {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
+
+          {/* Right side - Controls */}
+          <div className="flex items-center space-x-1">
+            {isAuthenticated && (
+              <>
+                {/* Search button */}
+                <button 
+                  onClick={handleSearch}
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  <Search className="w-5 h-5 text-gray-600" />
+                </button>
+
+                {isDashboard && (
+                  <button 
+                    onClick={() => setShowBalance(!showBalance)}
+                    className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  >
+                    {showBalance ? <Eye className="w-5 h-5 text-gray-600" /> : <EyeOff className="w-5 h-5 text-gray-600" />}
+                  </button>
+                )}
+                
+                <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors relative">
+                  <Bell className="w-5 h-5 text-gray-600" />
+                  <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                </button>
+              </>
+            )}
+            
+            <button
+              onClick={() => setIsOpen(!isOpen)}
+              className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+            >
+              {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
+          </div>
         </div>
 
+        {/* Mobile Menu */}
         {isOpen && (
-          <div className="bg-white border-t">
-            <div className="px-4 py-2 space-y-2">
+          <div className="bg-white border-t max-h-[80vh] overflow-y-auto">
+            <div className="px-4 py-2 space-y-1">
+              {/* User info */}
+              {isAuthenticated && (
+                <div className="flex items-center space-x-3 p-3 rounded-lg bg-gray-50 mb-2">
+                  <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center text-white font-semibold text-sm">
+                    {getUserInitials()}
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-semibold text-gray-900">{user?.fullName || 'Usuário'}</p>
+                    <p className="text-xs text-gray-500">Membro desde {user?.createdAt ? new Date(user.createdAt).toLocaleDateString('pt-BR') : 'N/A'}</p>
+                  </div>
+                </div>
+              )}
+              
               {navLinks.map((link) => {
                 const Icon = link.icon;
 
                 if (link.external) {
                   return (
                     <a
-                      key={link.path}
+                      key={link.id}
                       href={link.path}
                       target="_blank"
                       rel="noopener noreferrer"
@@ -152,7 +273,7 @@ const Navbar = ({ isAuthenticated }) => {
 
                 return (
                   <Link
-                    key={link.path}
+                    key={link.id}
                     to={link.path}
                     onClick={() => setIsOpen(false)}
                     className={`flex items-center space-x-3 p-3 rounded-lg transition-colors
@@ -168,8 +289,11 @@ const Navbar = ({ isAuthenticated }) => {
 
               {isAuthenticated && (
                 <button
-                  onClick={handleLogout}
-                  className="w-full flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 text-red-600"
+                  onClick={() => {
+                    handleLogout();
+                    setIsOpen(false);
+                  }}
+                  className="w-full flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 text-red-600 mt-2 border-t border-gray-100 pt-3"
                 >
                   <LogOut className="w-5 h-5" />
                   <span className="font-medium">Logout</span>
@@ -184,13 +308,13 @@ const Navbar = ({ isAuthenticated }) => {
       {isAuthenticated && (
         <div className="md:hidden fixed bottom-0 w-full bg-white border-t z-40">
           <div className="flex justify-around items-center py-2">
-            {navLinks.map((link) => {
+            {navLinks.slice(0, 5).map((link) => {
               const Icon = link.icon;
 
               if (link.external) {
                 return (
                   <a
-                    key={link.path}
+                    key={link.id + '-bottom'}
                     href={link.path}
                     target="_blank"
                     rel="noopener noreferrer"
@@ -204,7 +328,7 @@ const Navbar = ({ isAuthenticated }) => {
 
               return (
                 <Link
-                  key={link.path}
+                  key={link.id + '-bottom'}
                   to={link.path}
                   className={`flex flex-col items-center p-2 transition-colors
                     ${location.pathname === link.path 

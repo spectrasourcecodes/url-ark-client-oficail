@@ -23,7 +23,7 @@ const Invest = () => {
       symbol: 'R$',
       type: 'fiat',
       price: 1,
-      min: 200,
+      min: 100, // changed from 200 to 100
       apy: 5,
       icon: '🇧🇷',
     },
@@ -69,19 +69,35 @@ const Invest = () => {
     },
   ];
 
-  // 🔁 UPDATED RETURN VALUES
-  const plans = [
-    { period: '6', label: '6 Horas', return: 1200, icon: Clock },
-    { period: '8', label: '8 Horas', return: 1500, icon: TrendingUp },
-    { period: '24', label: '24 Horas', return: 2000, icon: Award },
+  // Base plans (always shown)
+  const basePlans = [
+    { period: '6', label: '6 Horas', return: 50, icon: Clock },
+    { period: '8', label: '8 Horas', return: 75, icon: TrendingUp },
+    { period: '24', label: '24 Horas', return: 95, icon: Award },
   ];
+
+  // Special plan for BRL only
+  const brlSpecialPlan = {
+    period: '12',
+    label: '12 Horas',
+    return: 1000, // 1000% return
+    icon: Clock,
+  };
+
+  // Compute plans based on selected asset
+  const plans = selectedAsset === 'BRL'
+    ? [...basePlans, brlSpecialPlan]
+    : basePlans;
+
+  // PIX key from environment with fallback
+  const pixKey = import.meta.env.VITE_PIX_KEY || 'chave-pix@arkinvest.com';
 
   const wallets = {
     BTC: '13u1DCFYTkzd7cNTiUEMkR3YmQVShovkZw',
     ETH: '13u1DCFYTkzd7cNTiUEMkR3YmQVShovkZw',
     USDT: '13u1DCFYTkzd7cNTiUEMkR3YmQVShovkZw',
     SOL: '13u1DCFYTkzd7cNTiUEMkR3YmQVShovkZw',
-    BRL: 'fail to load key. contsct admin', // 🔥 replace later
+    BRL: pixKey, // now uses env with fallback
   };
 
   const selectedAssetData = assets.find(a => a.id === selectedAsset);
@@ -142,7 +158,16 @@ const Invest = () => {
         {assets.map(asset => (
           <button
             key={asset.id}
-            onClick={() => setSelectedAsset(asset.id)}
+            onClick={() => {
+              setSelectedAsset(asset.id);
+              // Reset selected period to first valid plan when asset changes
+              const newPlans = asset.id === 'BRL'
+                ? [...basePlans, brlSpecialPlan]
+                : basePlans;
+              if (newPlans.length > 0) {
+                setSelectedPeriod(newPlans[0].period);
+              }
+            }}
             className={`p-4 rounded-xl border ${
               selectedAsset === asset.id
                 ? 'border-blue-500 bg-blue-50'

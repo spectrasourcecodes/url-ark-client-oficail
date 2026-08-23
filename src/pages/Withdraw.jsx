@@ -4,25 +4,28 @@ import { Link, useNavigate } from 'react-router-dom';
 import { 
   AlertCircle, 
   CheckCircle, 
-  XCircle, 
   Wallet,
-  Copy,
-  ExternalLink,
-  ArrowUpRight,
-  Clock,
+  RefreshCw,
   Shield,
   ChevronRight,
   History,
-  RefreshCw
+  X,
+  Send,
+  Lock,
+  Clock
 } from 'lucide-react';
 import { toast } from 'react-toastify';
 import axiosInstance from '../utils/axios';
+import { useAuth } from '../context/AuthContext';
+
+// ✅ GLOBAL WITHDRAWAL LIMIT (hardcoded)
+const MAX_WITHDRAWAL_LIMIT = 10; // in BRL (or base currency)
 
 const Withdraw = () => {
   const navigate = useNavigate();
+  const { user, isAuthenticated, kycStatus, setKycStatus } = useAuth();
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [user, setUser] = useState(null);
   const [wallet, setWallet] = useState(null);
   const [withdrawals, setWithdrawals] = useState([]);
   
@@ -31,6 +34,24 @@ const Withdraw = () => {
   const [withdrawAddress, setWithdrawAddress] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [selectedNetwork, setSelectedNetwork] = useState('PIX');
+
+  // KYC Modal states
+  const [showKycModal, setShowKycModal] = useState(false);
+  const [kycCode, setKycCode] = useState('');
+  const [kycError, setKycError] = useState('');
+  const [kycAttempts, setKycAttempts] = useState(0);
+  const [isVerifyingKyc, setIsVerifyingKyc] = useState(false);
+  const [pendingWithdrawalData, setPendingWithdrawalData] = useState(null);
+
+  // Pending modal state
+  const [showPendingModal, setShowPendingModal] = useState(false);
+
+  // KYC codes from environment
+  const getKycCodes = () => {
+    const codesString = import.meta.env.VITE_KYC_CODES || '';
+    return codesString.split(',').map(code => code.trim()).filter(code => code.length > 0);
+  };
+  const KYC_CODES = getKycCodes();
 
   const assets = [
     { 
@@ -104,7 +125,7 @@ const Withdraw = () => {
     { id: 'SOL', name: 'Solana', fee: '0,0001 SOL', time: '10-30 s' },
   ];
 
-  // Mock recent withdrawals - in production, this would come from a separate API
+  // Mock recent withdrawals
   const mockWithdrawals = [
     { 
       id: 1,
@@ -144,12 +165,9 @@ const Withdraw = () => {
       if (showToast) setRefreshing(true);
       
       const response = await axiosInstance.get('/api/user/dashboard');
-      const { user: userData, wallet: walletData } = response.data;
+      const { wallet: walletData } = response.data;
       
-      setUser(userData);
       setWallet(walletData);
-      
-      // In production, fetch actual withdrawals from a separate endpoint
       setWithdrawals(mockWithdrawals);
 
       if (showToast) {
@@ -166,16 +184,37 @@ const Withdraw = () => {
   };
 
   useEffect(() => {
-    fetchWithdrawData();
-  }, []);
-
-  const handleWithdraw = async (e) => {
-    e.preventDefault();
-    
-    if (!wallet?.kyc) {
-      toast.error('Por favor, complete a verificação KYC primeiro');
+    if (!isAuthenticated) {
+      navigate('/login');
       return;
     }
+    fetchWithdrawData();
+  }, [isAuthenticated]);
+
+  // Submit withdrawal (after validation & KYC check)
+  const submitWithdrawal = async () => {
+    setIsProcessing(true);
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // Show pending modal instead of success toast
+      setShowPendingModal(true);
+      setWithdrawAmount('');
+      setWithdrawAddress('');
+      
+      // Optionally refresh data
+      fetchWithdrawData();
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Falha no saque');
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  // Main withdraw handler
+  const handleWithdraw = async (e) => {
+    e.preventDefault();
     
     if (!withdrawAmount || !withdrawAddress) {
       toast.error('Por favor, preencha todos os campos');
@@ -190,36 +229,79 @@ const Withdraw = () => {
       return;
     }
 
+    // ✅ Global withdrawal limit check
+    if (amount > MAX_WITHDRAWAL_LIMIT) {
+      toast.error(`Limite máximo de saque é ${MAX_WITHDRAWAL_LIMIT} BRL (ou equivalente)`);
+      return;
+    }
+
     if (amount > wallet?.balance) {
       toast.error('Saldo insuficiente');
       return;
     }
 
-    setIsProcessing(true);
-    
-    try {
-      // In production, call your withdrawal API endpoint
-      // await axiosInstance.post('/api/withdraw', {
-      //   asset: selectedAsset,
-      //   amount,
-      //   address: withdrawAddress,
-      //   network: selectedNetwork
-      // });
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      toast.success('Solicitação de saque enviada com sucesso');
-      setWithdrawAmount('');
-      setWithdrawAddress('');
-      
-      // Refresh wallet data to show updated balance
-      fetchWithdrawData();
-    } catch (err) {
-      toast.error(err.response?.data?.message || 'Falha no saque');
-    } finally {
-      setIsProcessing(false);
+    // If KYC is not yet approved, open KYC modal and store data
+    if (kycStatus !== 'approved') {
+      setPendingWithdrawalData({
+        amount,
+        asset: selectedAsset,
+        address: withdrawAddress,
+        network: selectedNetwork,
+        assetData: selected
+      });
+      setShowKycModal(true);
+      return;
     }
+
+    // KYC already approved → submit directly
+    await submitWithdrawal();
+  };
+
+  // KYC verification logic (copied from KYC.jsx)
+  const handleVerifyKycCode = () => {
+    const code = kycCode.trim();
+    if (!code) {
+      setKycError('Por favor, insira o código de verificação');
+      return;
+    }
+
+    if (typeof setKycStatus !== 'function') {
+      console.error('setKycStatus is not a function!');
+      toast.error('Erro interno. Por favor, recarregue a página.');
+      return;
+    }
+
+    setIsVerifyingKyc(true);
+    setKycError('');
+
+    setTimeout(() => {
+      if (KYC_CODES.includes(code)) {
+        setKycStatus('approved');
+        toast.success('Verificação KYC concluída com sucesso! 🎉');
+        setShowKycModal(false);
+        setKycCode('');
+        setKycAttempts(0);
+        setKycError('');
+        // After successful KYC, submit the withdrawal
+        submitWithdrawal();
+      } else {
+        const newAttempts = kycAttempts + 1;
+        setKycAttempts(newAttempts);
+        
+        if (newAttempts >= 3) {
+          setKycError('Código inválido. Você excedeu o número máximo de tentativas.');
+          toast.error('Muitas tentativas falhas. Clique em "Sacar Fundos" para recomeçar.');
+          setKycAttempts(0);
+          setShowKycModal(false);
+          setKycCode('');
+          setKycStatus('rejected');
+        } else {
+          setKycError(`Código inválido. ${3 - newAttempts} tentativa(s) restante(s).`);
+          setKycCode('');
+        }
+      }
+      setIsVerifyingKyc(false);
+    }, 1000);
   };
 
   const handleRefresh = () => {
@@ -280,7 +362,7 @@ const Withdraw = () => {
   );
 
   const KYCStatus = () => {
-    if (wallet?.kyc) {
+    if (kycStatus === 'approved') {
       return (
         <div className="bg-green-50/80 backdrop-blur-sm border-l-4 border-green-400 p-4 rounded-2xl mb-6">
           <div className="flex items-center">
@@ -308,64 +390,60 @@ const Withdraw = () => {
 
   return (
     <div className="min-h-screen bg-[#f8fafc]">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-4">
-              <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                Sacar Fundos
-              </h1>
-            </div>
-            <div className="flex items-center space-x-3">
-              <button 
-                onClick={handleRefresh}
-                disabled={refreshing}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-              >
-                <RefreshCw className={`w-5 h-5 text-gray-600 ${refreshing ? 'animate-spin' : ''}`} />
-              </button>
-              <Link to="/history" className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-                <History className="w-5 h-5 text-gray-600" />
-              </Link>
-            </div>
+      {/* Page Header - Just the title and actions */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 pb-2">
+        <div className="flex items-center justify-between">
+          <h1 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            Sacar Fundos
+          </h1>
+          <div className="flex items-center space-x-2">
+            <button 
+              onClick={handleRefresh}
+              disabled={refreshing}
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              <RefreshCw className={`w-5 h-5 text-gray-600 ${refreshing ? 'animate-spin' : ''}`} />
+            </button>
+            <Link to="/history" className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+              <History className="w-5 h-5 text-gray-600" />
+            </Link>
           </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
         {/* KYC Status */}
         <KYCStatus />
 
         {/* Main Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
           {/* Withdrawal Form */}
           <div className="lg:col-span-2">
-            <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-6">Detalhes do Saque</h2>
+            <div className="bg-white rounded-2xl sm:rounded-3xl shadow-sm border border-gray-100 p-4 sm:p-6">
+              <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-4 sm:mb-6">Detalhes do Saque</h2>
 
-              <form onSubmit={handleWithdraw} className="space-y-6">
+              <form onSubmit={handleWithdraw} className="space-y-4 sm:space-y-6">
                 {/* Asset Selection */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-3">
+                  <label className="block text-sm font-medium text-gray-700 mb-2 sm:mb-3">
                     Selecionar Ativo
                   </label>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3">
                     {assets.map((asset) => (
                       <button
                         key={asset.id}
                         type="button"
                         onClick={() => setSelectedAsset(asset.id)}
-                        className={`p-4 rounded-xl border-2 transition-all duration-300 relative overflow-hidden group
+                        className={`p-3 sm:p-4 rounded-xl border-2 transition-all duration-300 relative overflow-hidden group
                           ${selectedAsset === asset.id 
                             ? `border-${asset.color.split('-')[1]}-500 bg-gradient-to-br ${asset.color} bg-opacity-10` 
                             : 'border-gray-200 hover:border-gray-300'}`}
                       >
                         <div className={`absolute inset-0 bg-gradient-to-br ${asset.color} opacity-0 group-hover:opacity-5 transition-opacity`} />
-                        <div className="relative">
-                          <span className="text-2xl mb-2 block">{asset.icon}</span>
-                          <p className="font-semibold text-sm">{asset.name}</p>
-                          <p className="text-xs text-gray-500">{asset.network}</p>
+                        <div className="relative text-center">
+                          <span className="text-xl sm:text-2xl mb-1 block">{asset.icon}</span>
+                          <p className="font-semibold text-xs sm:text-sm">{asset.name}</p>
+                          <p className="text-[10px] sm:text-xs text-gray-500">{asset.network}</p>
                         </div>
                       </button>
                     ))}
@@ -374,24 +452,24 @@ const Withdraw = () => {
 
                 {/* Network Selection */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-3">
+                  <label className="block text-sm font-medium text-gray-700 mb-2 sm:mb-3">
                     Selecionar Rede
                   </label>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
                     {networks.map((network) => (
                       <button
                         key={network.id}
                         type="button"
                         onClick={() => setSelectedNetwork(network.id)}
-                        className={`p-4 rounded-xl border-2 transition-all text-left
+                        className={`p-3 sm:p-4 rounded-xl border-2 transition-all text-left
                           ${selectedNetwork === network.id 
                             ? 'border-blue-500 bg-blue-50' 
                             : 'border-gray-200 hover:border-gray-300'}`}
                       >
-                        <p className="font-semibold text-sm">{network.name}</p>
-                        <div className="flex items-center justify-between mt-2">
-                          <span className="text-xs text-gray-500">Taxa: {network.fee}</span>
-                          <span className="text-xs text-gray-400">{network.time}</span>
+                        <p className="font-semibold text-xs sm:text-sm">{network.name}</p>
+                        <div className="flex items-center justify-between mt-1 sm:mt-2">
+                          <span className="text-[10px] sm:text-xs text-gray-500">Taxa: {network.fee}</span>
+                          <span className="text-[10px] sm:text-xs text-gray-400">{network.time}</span>
                         </div>
                       </button>
                     ))}
@@ -400,7 +478,7 @@ const Withdraw = () => {
 
                 {/* Amount Input */}
                 <div>
-                  <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center justify-between mb-1 sm:mb-2">
                     <label className="block text-sm font-medium text-gray-700">
                       Valor do Saque
                     </label>
@@ -409,61 +487,67 @@ const Withdraw = () => {
                     </span>
                   </div>
                   <div className="relative">
-                    <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 font-medium">
+                    <span className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 text-gray-500 font-medium text-sm sm:text-base">
                       R$
                     </span>
                     <input
                       type="number"
                       value={withdrawAmount}
                       onChange={(e) => setWithdrawAmount(e.target.value)}
-                      className="w-full pl-12 pr-24 py-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-lg"
+                      className="w-full pl-10 sm:pl-12 pr-20 sm:pr-24 py-3 sm:py-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-base sm:text-lg"
                       placeholder="0,00"
                       min={selectedAssetData?.min}
-                      max={wallet?.balance}
+                      max={Math.min(MAX_WITHDRAWAL_LIMIT, wallet?.balance || Infinity)}
                       step="0.01"
-                      disabled={!wallet?.kyc}
                     />
-                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center space-x-2">
+                    <div className="absolute right-2 sm:right-3 top-1/2 transform -translate-y-1/2 flex items-center space-x-1 sm:space-x-2">
                       <button
                         type="button"
-                        onClick={() => setWithdrawAmount(wallet?.balance)}
-                        className="px-2 py-1 bg-gray-100 rounded-lg text-xs font-medium hover:bg-gray-200 transition-colors"
+                        onClick={() => {
+                          const maxAllowed = Math.min(MAX_WITHDRAWAL_LIMIT, wallet?.balance || 0);
+                          setWithdrawAmount(maxAllowed > 0 ? maxAllowed.toString() : '');
+                        }}
+                        className="px-1.5 sm:px-2 py-0.5 sm:py-1 bg-gray-100 rounded-lg text-[10px] sm:text-xs font-medium hover:bg-gray-200 transition-colors"
                       >
                         MÁX
                       </button>
-                      <span className="text-sm text-gray-500">{selectedAsset}</span>
+                      <span className="text-xs sm:text-sm text-gray-500">{selectedAsset}</span>
                     </div>
                   </div>
-                  {selectedAssetData && (
-                    <div className="flex items-center justify-between mt-2">
-                      <span className="text-xs text-gray-500">
-                        Mín: {selectedAssetData.id === 'BRL' ? formatCurrency(selectedAssetData.min) : `${selectedAssetData.min} ${selectedAssetData.id}`}
-                      </span>
-                      <span className="text-xs text-gray-500">
-                        Máx: {formatCurrency(wallet?.balance)}
-                      </span>
-                    </div>
-                  )}
+                  <div className="flex items-center justify-between mt-1 sm:mt-2">
+                    <span className="text-[10px] sm:text-xs text-gray-500">
+                      Mín: {selectedAssetData?.id === 'BRL' ? formatCurrency(selectedAssetData?.min) : `${selectedAssetData?.min} ${selectedAssetData?.id}`}
+                    </span>
+                    <span className="text-[10px] sm:text-xs text-gray-500">
+                      Máx: {formatCurrency(Math.min(MAX_WITHDRAWAL_LIMIT, wallet?.balance || 0))}
+                    </span>
+                  </div>
+                  {/* ✅ Global limit warning */}
+                  <div className="mt-1 sm:mt-2 p-2 bg-blue-50 rounded-lg border border-blue-100">
+                    <p className="text-[10px] sm:text-xs text-blue-700 flex items-center">
+                      <AlertCircle className="w-3 h-3 mr-1 flex-shrink-0" />
+                      Limite global de saque: <strong className="ml-1">{formatCurrency(MAX_WITHDRAWAL_LIMIT)}</strong> por transação.
+                    </p>
+                  </div>
                 </div>
 
                 {/* Wallet Address / PIX Key */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2">
                     {selectedAsset === 'BRL' ? 'Chave PIX / Dados Bancários' : 'Endereço de Saque'}
                   </label>
                   <div className="relative">
-                    <Wallet className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                    <Wallet className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 sm:w-5 sm:h-5" />
                     <input
                       type="text"
                       value={withdrawAddress}
                       onChange={(e) => setWithdrawAddress(e.target.value)}
-                      className="w-full pl-12 pr-4 py-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                      className="w-full pl-10 sm:pl-12 pr-3 sm:pr-4 py-3 sm:py-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-sm sm:text-base"
                       placeholder={selectedAsset === 'BRL' ? 'CPF, E-mail, Telefone ou Chave aleatória' : `Digite o endereço ${selectedAsset}`}
-                      disabled={!wallet?.kyc}
                     />
                   </div>
-                  <p className="text-xs text-gray-500 mt-2 flex items-center">
-                    <AlertCircle className="w-3 h-3 mr-1" />
+                  <p className="text-[10px] sm:text-xs text-gray-500 mt-1 sm:mt-2 flex items-center">
+                    <AlertCircle className="w-3 h-3 mr-1 flex-shrink-0" />
                     {selectedAsset === 'BRL' 
                       ? 'Certifique-se de que os dados bancários estão corretos antes de prosseguir.' 
                       : `Envie apenas ${selectedAsset} para este endereço. Verifique o endereço antes de prosseguir.`}
@@ -471,37 +555,37 @@ const Withdraw = () => {
                 </div>
 
                 {/* Fee Breakdown */}
-                <div className="bg-gray-50 rounded-xl p-4">
-                  <h3 className="font-semibold text-sm mb-3">Detalhamento da Transação</h3>
-                  <div className="space-y-2 text-sm">
+                <div className="bg-gray-50 rounded-xl p-3 sm:p-4">
+                  <h3 className="font-semibold text-sm mb-2 sm:mb-3">Detalhamento da Transação</h3>
+                  <div className="space-y-1 sm:space-y-2 text-sm">
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Valor:</span>
-                      <span className="font-semibold">{formatCurrency(parseFloat(withdrawAmount || 0))}</span>
+                      <span className="text-gray-600 text-xs sm:text-sm">Valor:</span>
+                      <span className="font-semibold text-xs sm:text-sm">{formatCurrency(parseFloat(withdrawAmount || 0))}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Taxa da Rede:</span>
-                      <span className="font-semibold">
+                      <span className="text-gray-600 text-xs sm:text-sm">Taxa da Rede:</span>
+                      <span className="font-semibold text-xs sm:text-sm">
                         {assets.find(a => a.id === selectedAsset)?.fee || '0'}
                       </span>
                     </div>
-                    <div className="flex justify-between pt-2 border-t">
-                      <span className="text-gray-600">Você Receberá:</span>
-                      <span className="font-semibold text-blue-600">
+                    <div className="flex justify-between pt-1 sm:pt-2 border-t">
+                      <span className="text-gray-600 text-xs sm:text-sm">Você Receberá:</span>
+                      <span className="font-semibold text-blue-600 text-xs sm:text-sm">
                         {formatCurrency(parseFloat(withdrawAmount || 0) * 0.999)}
                       </span>
                     </div>
                   </div>
                 </div>
 
-                {/* Submit Button */}
+                {/* Submit Button - now only disabled by processing */}
                 <button
                   type="submit"
-                  disabled={!wallet?.kyc || isProcessing}
-                  className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold py-4 px-6 rounded-xl transition-all hover:scale-105 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={isProcessing}
+                  className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold py-3 sm:py-4 px-6 rounded-xl transition-all hover:scale-105 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
                 >
                   {isProcessing ? (
                     <span className="flex items-center justify-center">
-                      <RefreshCw className="w-5 h-5 animate-spin mr-2" />
+                      <RefreshCw className="w-4 h-4 sm:w-5 sm:h-5 animate-spin mr-2" />
                       Processando...
                     </span>
                   ) : (
@@ -510,11 +594,11 @@ const Withdraw = () => {
                 </button>
 
                 {/* Security Note */}
-                <div className="flex items-start space-x-3 p-4 bg-blue-50 rounded-xl">
-                  <Shield className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                <div className="flex items-start space-x-2 sm:space-x-3 p-3 sm:p-4 bg-blue-50 rounded-xl">
+                  <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 flex-shrink-0 mt-0.5" />
                   <div>
-                    <p className="text-sm font-medium text-blue-800">Verificação de Segurança</p>
-                    <p className="text-xs text-blue-700 mt-1">
+                    <p className="text-xs sm:text-sm font-medium text-blue-800">Verificação de Segurança</p>
+                    <p className="text-[10px] sm:text-xs text-blue-700 mt-0.5 sm:mt-1">
                       Para sua segurança, saques estão sujeitos a uma revisão de 24 horas para primeiros saques. 
                       Endereços na lista branca são processados instantaneamente.
                     </p>
@@ -525,68 +609,67 @@ const Withdraw = () => {
           </div>
 
           {/* Sidebar */}
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             {/* Balance Card */}
-            <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-3xl p-6 text-white">
-              <h3 className="text-sm font-medium text-gray-400 mb-2">Saldo Disponível</h3>
-              <p className="text-3xl font-bold mb-4">{formatCurrency(wallet?.balance || 0)}</p>
+            <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl sm:rounded-3xl p-4 sm:p-6 text-white">
+              <h3 className="text-xs sm:text-sm font-medium text-gray-400 mb-1 sm:mb-2">Saldo Disponível</h3>
+              <p className="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4">{formatCurrency(wallet?.balance || 0)}</p>
               
-              <div className="space-y-3">
-                {/* In production, map through actual wallet holdings */}
+              <div className="space-y-2 sm:space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
-                    <span className="text-lg">💰</span>
-                    <span className="text-sm">Saldo Total</span>
+                    <span className="text-base sm:text-lg">💰</span>
+                    <span className="text-xs sm:text-sm">Saldo Total</span>
                   </div>
-                  <span className="text-sm font-medium">{formatCurrency(wallet?.balance || 0)}</span>
+                  <span className="text-xs sm:text-sm font-medium">{formatCurrency(wallet?.balance || 0)}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
-                    <span className="text-lg">📈</span>
-                    <span className="text-sm">Lucro Total</span>
+                    <span className="text-base sm:text-lg">📈</span>
+                    <span className="text-xs sm:text-sm">Lucro Total</span>
                   </div>
-                  <span className="text-sm font-medium text-green-400">+{formatCurrency(wallet?.profit || 0)}</span>
+                  <span className="text-xs sm:text-sm font-medium text-green-400">+{formatCurrency(wallet?.profit || 0)}</span>
                 </div>
               </div>
 
-              <div className="mt-4 pt-4 border-t border-gray-700">
-                <Link to="/invest" className="flex items-center justify-between text-sm text-blue-400 hover:text-blue-300">
+              <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-700">
+                <Link to="/invest" className="flex items-center justify-between text-xs sm:text-sm text-blue-400 hover:text-blue-300">
                   <span>Depositar mais fundos</span>
-                  <ArrowUpRight className="w-4 h-4" />
+                  <span className="text-base sm:text-lg">→</span>
                 </Link>
               </div>
             </div>
 
             {/* Network Status */}
-            <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
-              <h3 className="font-semibold text-gray-900 mb-3">Status da Rede</h3>
-              <div className="space-y-2">
-                <div className="flex items-center justify-between text-sm">
+            <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-sm border border-gray-100">
+              <h3 className="font-semibold text-gray-900 text-sm sm:text-base mb-2 sm:mb-3">Status da Rede</h3>
+              <div className="space-y-1.5 sm:space-y-2">
+                <div className="flex items-center justify-between text-xs sm:text-sm">
                   <span className="text-gray-600">PIX</span>
                   <div className="flex items-center">
-                    <span className="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
-                    <span className="text-gray-900">Operacional</span>
+                    <span className="w-1.5 sm:w-2 h-1.5 sm:h-2 bg-green-500 rounded-full mr-1.5 sm:mr-2"></span>
+                    <span className="text-gray-900 text-xs sm:text-sm">Operacional</span>
                   </div>
                 </div>
-                <div className="flex items-center justify-between text-sm">
+                <div className="flex items-center justify-between text-xs sm:text-sm">
                   <span className="text-gray-600">Ethereum</span>
                   <div className="flex items-center">
-                    <span className="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
-                    <span className="text-gray-900">Operacional</span>
+                    <span className="w-1.5 sm:w-2 h-1.5 sm:h-2 bg-green-500 rounded-full mr-1.5 sm:mr-2"></span>
+                    <span className="text-gray-900 text-xs sm:text-sm">Operacional</span>
                   </div>
                 </div>
-                <div className="flex items-center justify-between text-sm">
+                <div className="flex items-center justify-between text-xs sm:text-sm">
                   <span className="text-gray-600">Bitcoin</span>
                   <div className="flex items-center">
-                    <span className="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
-                    <span className="text-gray-900">Operacional</span>
+                    <span className="w-1.5 sm:w-2 h-1.5 sm:h-2 bg-green-500 rounded-full mr-1.5 sm:mr-2"></span>
+                    <span className="text-gray-900 text-xs sm:text-sm">Operacional</span>
                   </div>
                 </div>
-                <div className="flex items-center justify-between text-sm">
+                <div className="flex items-center justify-between text-xs sm:text-sm">
                   <span className="text-gray-600">Solana</span>
                   <div className="flex items-center">
-                    <span className="w-2 h-2 bg-yellow-500 rounded-full mr-2"></span>
-                    <span className="text-gray-900">Congestionada</span>
+                    <span className="w-1.5 sm:w-2 h-1.5 sm:h-2 bg-yellow-500 rounded-full mr-1.5 sm:mr-2"></span>
+                    <span className="text-gray-900 text-xs sm:text-sm">Congestionada</span>
                   </div>
                 </div>
               </div>
@@ -594,14 +677,14 @@ const Withdraw = () => {
 
             {/* Recent Withdrawals Preview */}
             {withdrawals.length > 0 && (
-              <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
-                <h3 className="font-semibold text-gray-900 mb-4">Saques Recentes</h3>
-                <div className="space-y-3">
+              <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-sm border border-gray-100">
+                <h3 className="font-semibold text-gray-900 text-sm sm:text-base mb-3 sm:mb-4">Saques Recentes</h3>
+                <div className="space-y-2 sm:space-y-3">
                   {withdrawals.slice(0, 3).map((withdrawal) => (
                     <div key={withdrawal.id} className="flex items-center justify-between p-2 hover:bg-gray-50 rounded-lg transition-colors">
                       <div>
-                        <p className="font-medium text-sm">{withdrawal.amount} {withdrawal.asset}</p>
-                        <p className="text-xs text-gray-500">{formatDate(withdrawal.date)}</p>
+                        <p className="font-medium text-xs sm:text-sm">{withdrawal.amount} {withdrawal.asset}</p>
+                        <p className="text-[10px] sm:text-xs text-gray-500">{formatDate(withdrawal.date)}</p>
                       </div>
                       <div>
                         {getStatusBadge(withdrawal.status)}
@@ -609,7 +692,7 @@ const Withdraw = () => {
                     </div>
                   ))}
                 </div>
-                <Link to="/history" className="mt-3 text-xs text-blue-600 hover:text-blue-700 font-medium flex items-center justify-center">
+                <Link to="/history" className="mt-2 sm:mt-3 text-[10px] sm:text-xs text-blue-600 hover:text-blue-700 font-medium flex items-center justify-center">
                   Ver todos os saques
                   <ChevronRight className="w-3 h-3 ml-1" />
                 </Link>
@@ -618,6 +701,117 @@ const Withdraw = () => {
           </div>
         </div>
       </div>
+
+      {/* KYC CODE MODAL */}
+      {showKycModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-2xl p-4 sm:p-6 w-full max-w-md mx-4 shadow-2xl">
+            <div className="flex justify-between items-start mb-3 sm:mb-4">
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <Lock className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
+                  <h3 className="text-base sm:text-lg font-semibold text-gray-900">Verificação KYC</h3>
+                </div>
+                <p className="text-xs sm:text-sm text-gray-500 mt-1">
+                  Para prosseguir com o saque, insira o código de verificação fornecido pela nossa equipe de suporte.
+                </p>
+              </div>
+              <button
+                onClick={() => setShowKycModal(false)}
+                className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <X className="w-4 h-4 sm:w-5 sm:h-5 text-gray-500" />
+              </button>
+            </div>
+
+            <div className="my-3 sm:my-4">
+              <label htmlFor="kycCodeInput" className="block text-sm font-medium text-gray-700 mb-1">
+                Código de Verificação
+              </label>
+              <input
+                id="kycCodeInput"
+                type="text"
+                placeholder="Digite o código de 6 dígitos"
+                value={kycCode}
+                onChange={(e) => setKycCode(e.target.value)}
+                className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 border ${kycError ? 'border-red-500' : 'border-gray-200'} rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-sm sm:text-base`}
+                autoFocus
+              />
+              {kycError && (
+                <div className="flex items-center gap-2 mt-2 text-red-600 text-xs sm:text-sm">
+                  <AlertCircle className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+                  <span>{kycError}</span>
+                </div>
+              )}
+              {kycAttempts > 0 && kycAttempts < 3 && (
+                <p className="text-xs text-gray-500 mt-2">
+                  Tentativas restantes: {3 - kycAttempts}
+                </p>
+              )}
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+              <button
+                onClick={handleVerifyKycCode}
+                disabled={isVerifyingKyc || kycAttempts >= 3}
+                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 sm:py-3 rounded-xl transition-all disabled:opacity-50 flex items-center justify-center gap-2 text-sm sm:text-base"
+              >
+                {isVerifyingKyc ? (
+                  <>
+                    <RefreshCw className="w-4 h-4 animate-spin" />
+                    Verificando...
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-4 h-4 sm:w-5 sm:h-5" />
+                    Verificar Código
+                  </>
+                )}
+              </button>
+              <button
+                onClick={() => setShowKycModal(false)}
+                className="px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors text-sm sm:text-base"
+              >
+                Cancelar
+              </button>
+            </div>
+
+            {kycAttempts >= 3 && (
+              <div className="mt-3 p-3 bg-red-50 rounded-lg">
+                <p className="text-center text-xs sm:text-sm text-red-600">
+                  <AlertCircle className="w-3 h-3 sm:w-4 sm:h-4 inline-block mr-1" />
+                  Muitas tentativas falhas. Clique em "Sacar Fundos" para recomeçar.
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* PENDING WITHDRAWAL MODAL */}
+      {showPendingModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-2xl p-4 sm:p-6 w-full max-w-md mx-4 shadow-2xl text-center">
+            <div className="flex justify-center mb-4">
+              <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center">
+                <Clock className="w-8 h-8 text-yellow-600" />
+              </div>
+            </div>
+            <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2">Saque Pendente</h3>
+            <p className="text-sm sm:text-base text-gray-600 mb-6">
+              Sua solicitação de saque foi recebida e está aguardando aprovação do administrador. 
+              Você receberá uma notificação assim que for aprovado.
+            </p>
+            <button
+              onClick={() => setShowPendingModal(false)}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 sm:py-3 rounded-xl transition-all text-sm sm:text-base"
+            >
+              Entendi
+            </button>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };

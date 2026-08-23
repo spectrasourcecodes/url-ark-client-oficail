@@ -1,13 +1,13 @@
 // public/service-worker.js
 
-const CACHE_NAME = 'ArkInvest-v1';
+const CACHE_NAME = 'ArkInvestX1-v1';
 
 const STATIC_ASSETS = [
   '/',
   '/index.html',
   '/manifest.json',
-  '/icons/icon-192x192.jpeg',
-  '/icons/icon-512x512.jpeg',
+  '/icons/icon-192x192.png',
+  '/icons/icon-512x512.png',
 ];
 
 // Install – cache core assets

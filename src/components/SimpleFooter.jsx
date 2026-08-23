@@ -33,7 +33,7 @@ const SimpleFooter = () => {
           <div className="flex items-center space-x-1 mt-2 sm:mt-0">
             <span>Made with</span>
             <Heart className="w-4 h-4 text-red-500 fill-current" />
-            <span>by Ark</span>
+            <span>by Ark Invest Team</span>
           </div>
         </div>
       </div>

@@ -1,98 +1,85 @@
 // src/pages/Register.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, User, Gift } from 'lucide-react';
 import { toast } from 'react-toastify';
-import axiosInstance from '../utils/axios';
+import { useAuth } from '../context/AuthContext';
 
 const Register = () => {
+  console.log("📝 Register component rendering");
   const navigate = useNavigate();
+  const { register, isAuthenticated } = useAuth();
   const [formData, setFormData] = useState({
-    fullName: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-    referralCode: '',
+      fullName: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
+      referralCode: '',
   });
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
 
+  // Redirect if already authenticated
+  useEffect(() => {
+      if (isAuthenticated) {
+          console.log('📝 User is authenticated, redirecting to dashboard');
+          navigate('/dashboard');
+      }
+  }, [isAuthenticated, navigate]);
+
   const validateForm = () => {
-    const newErrors = {};
-
-    if (!formData.fullName) newErrors.fullName = 'Nome completo é obrigatório';
-    if (!formData.email) {
-      newErrors.email = 'E-mail é obrigatório';
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'E-mail inválido';
-    }
-    if (!formData.password) {
-      newErrors.password = 'Senha é obrigatória';
-    } else if (formData.password.length < 8) {
-      newErrors.password = 'A senha deve ter pelo menos 8 caracteres';
-    }
-    if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'As senhas não coincidem';
-    }
-
-    return newErrors;
+      const newErrors = {};
+      if (!formData.fullName) newErrors.fullName = 'Nome completo é obrigatório';
+      if (!formData.email) {
+          newErrors.email = 'E-mail é obrigatório';
+      } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+          newErrors.email = 'E-mail inválido';
+      }
+      if (!formData.password) {
+          newErrors.password = 'Senha é obrigatória';
+      } else if (formData.password.length < 8) {
+          newErrors.password = 'A senha deve ter pelo menos 8 caracteres';
+      }
+      if (formData.password !== formData.confirmPassword) {
+          newErrors.confirmPassword = 'As senhas não coincidem';
+      }
+      return newErrors;
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+      e.preventDefault();
 
-    const newErrors = validateForm();
+      const newErrors = validateForm();
+      if (Object.keys(newErrors).length > 0) {
+          setErrors(newErrors);
+          toast.error("Por favor, corrija os erros no formulário");
+          return;
+      }
 
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      toast.error("Por favor, corrija os erros no formulário");
-      return;
-    }
-
-    try {
       setIsLoading(true);
 
-      const { data } = await axiosInstance.post(
-        "/api/user/register",
-        {
+      const result = await register({
           fullName: formData.fullName,
           email: formData.email,
           password: formData.password,
           referralCode: formData.referralCode || null,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      });
 
-      // ✅ Save token (important)
-      localStorage.setItem("token", data.token);
-
-      data.success == true ?
-            toast.success(data.message):
-            toast.error(data.message);
-
-      // ✅ Redirect
-      navigate("/login"); // or /login if you prefer
-
-    } catch (error) {
-      const message =
-        error.response?.data?.message || "Algo deu errado";
-
-      toast.error(message);
-    } finally {
-      setIsLoading(false);
-    }
+      if (result.success) {
+          toast.success(result.message);
+          // The useEffect above will handle the redirect
+      } else {
+          toast.error(result.message);
+          setIsLoading(false);
+      }
   };
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-    if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: '' }));
-    }
+      const { name, value } = e.target;
+      setFormData(prev => ({ ...prev, [name]: value }));
+      if (errors[name]) {
+          setErrors(prev => ({ ...prev, [name]: '' }));
+      }
   };
 
   return (
