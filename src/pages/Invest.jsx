@@ -9,85 +9,11 @@ import { toast } from 'react-toastify';
 const Invest = () => {
   const [selectedAsset, setSelectedAsset] = useState('BRL');
   const [investmentAmount, setInvestmentAmount] = useState('');
-  const [selectedPeriod, setSelectedPeriod] = useState('6');
+  const [selectedPeriod, setSelectedPeriod] = useState('12');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [agreeToTerms, setAgreeToTerms] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-
-  // ✅ ORDER: BRL → USDT → Others
-  const assets = [
-    {
-      id: 'BRL',
-      name: 'Real (PIX)',
-      symbol: 'R$',
-      type: 'fiat',
-      price: 1,
-      min: 100, // changed from 200 to 100
-      apy: 5,
-      icon: '🇧🇷',
-    },
-    {
-      id: 'USDT',
-      name: 'Tether',
-      symbol: 'USDT',
-      type: 'crypto',
-      price: 5.0,
-      min: 100,
-      apy: 4.5,
-      icon: '💵',
-    },
-    {
-      id: 'BTC',
-      name: 'Bitcoin',
-      symbol: 'BTC',
-      type: 'crypto',
-      price: 261725,
-      min: 100,
-      apy: 8.5,
-      icon: '₿',
-    },
-    {
-      id: 'ETH',
-      name: 'Ethereum',
-      symbol: 'ETH',
-      type: 'crypto',
-      price: 16170,
-      min: 50,
-      apy: 6.2,
-      icon: 'Ξ',
-    },
-    {
-      id: 'SOL',
-      name: 'Solana',
-      symbol: 'SOL',
-      type: 'crypto',
-      price: 712.5,
-      min: 50,
-      apy: 9.5,
-      icon: '◎',
-    },
-  ];
-
-  // Base plans (always shown)
-  const basePlans = [
-    { period: '6', label: '6 Horas', return: 50, icon: Clock },
-    { period: '8', label: '8 Horas', return: 75, icon: TrendingUp },
-    { period: '24', label: '24 Horas', return: 95, icon: Award },
-  ];
-
-  // Special plan for BRL only
-  const brlSpecialPlan = {
-    period: '12',
-    label: '12 Horas',
-    return: 1000, // 1000% return
-    icon: Clock,
-  };
-
-  // Compute plans based on selected asset
-  const plans = selectedAsset === 'BRL'
-    ? [...basePlans, brlSpecialPlan]
-    : basePlans;
 
   // PIX key from environment with fallback
   const pixKey = import.meta.env.VITE_PIX_KEY || 'chave-pix@arkinvest.com';
@@ -97,11 +23,73 @@ const Invest = () => {
     ETH: '13u1DCFYTkzd7cNTiUEMkR3YmQVShovkZw',
     USDT: '13u1DCFYTkzd7cNTiUEMkR3YmQVShovkZw',
     SOL: '13u1DCFYTkzd7cNTiUEMkR3YmQVShovkZw',
-    BRL: pixKey, // now uses env with fallback
+    BRL: pixKey,
   };
 
+  // Asset definitions with minimum and returns per period
+  const assets = [
+    {
+      id: 'BRL',
+      name: 'Real (PIX)',
+      symbol: 'R$',
+      type: 'fiat',
+      price: 1,
+      min: 100,
+      returns: { 12: 500, 24: 1000, 48: 2000 },
+      icon: '🇧🇷',
+    },
+    {
+      id: 'USDT',
+      name: 'Tether',
+      symbol: 'USDT',
+      type: 'crypto',
+      price: 5.0,
+      min: 25,
+      returns: { 12: 400, 24: 800, 48: 1600 },
+      icon: '💵',
+    },
+    {
+      id: 'BTC',
+      name: 'Bitcoin',
+      symbol: 'BTC',
+      type: 'crypto',
+      price: 261725,
+      min: 0.0005, // ~$25 at current price
+      returns: { 12: 400, 24: 800, 48: 1600 },
+      icon: '₿',
+    },
+    {
+      id: 'ETH',
+      name: 'Ethereum',
+      symbol: 'ETH',
+      type: 'crypto',
+      price: 16170,
+      min: 0.01, // ~$25 at current price
+      returns: { 12: 400, 24: 800, 48: 1600 },
+      icon: 'Ξ',
+    },
+    {
+      id: 'SOL',
+      name: 'Solana',
+      symbol: 'SOL',
+      type: 'crypto',
+      price: 712.5,
+      min: 0.2, // ~$25 at current price
+      returns: { 12: 400, 24: 800, 48: 1600 },
+      icon: '◎',
+    },
+  ];
+
+  // Period definitions (shared for all assets)
+  const periods = [
+    { id: '12', label: '12 Horas', icon: Clock },
+    { id: '24', label: '24 Horas', icon: TrendingUp },
+    { id: '48', label: '48 Horas', icon: Award },
+  ];
+
   const selectedAssetData = assets.find(a => a.id === selectedAsset);
-  const selectedPlan = plans.find(p => p.period === selectedPeriod);
+  const selectedPeriodData = periods.find(p => p.id === selectedPeriod);
+  const returnPercentage = selectedAssetData?.returns?.[selectedPeriod] || 0;
 
   const isFiat = selectedAsset === 'BRL';
 
@@ -116,7 +104,7 @@ const Invest = () => {
   };
 
   const projectedReturn =
-    (parseFloat(investmentAmount) || 0) * (selectedPlan?.return / 100 || 0);
+    (parseFloat(investmentAmount) || 0) * (returnPercentage / 100);
 
   const total = (parseFloat(investmentAmount) || 0) + projectedReturn;
 
@@ -160,13 +148,8 @@ const Invest = () => {
             key={asset.id}
             onClick={() => {
               setSelectedAsset(asset.id);
-              // Reset selected period to first valid plan when asset changes
-              const newPlans = asset.id === 'BRL'
-                ? [...basePlans, brlSpecialPlan]
-                : basePlans;
-              if (newPlans.length > 0) {
-                setSelectedPeriod(newPlans[0].period);
-              }
+              // Reset to first period (12h)
+              setSelectedPeriod('12');
             }}
             className={`p-4 rounded-xl border ${
               selectedAsset === asset.id
@@ -203,21 +186,22 @@ const Invest = () => {
 
       {/* PLANS */}
       <div className="grid grid-cols-3 gap-4 mb-6">
-        {plans.map(plan => {
-          const Icon = plan.icon;
+        {periods.map(period => {
+          const Icon = period.icon;
+          const ret = selectedAssetData?.returns?.[period.id] || 0;
           return (
             <button
-              key={plan.period}
-              onClick={() => setSelectedPeriod(plan.period)}
+              key={period.id}
+              onClick={() => setSelectedPeriod(period.id)}
               className={`p-4 rounded-xl border ${
-                selectedPeriod === plan.period
+                selectedPeriod === period.id
                   ? 'border-purple-500 bg-purple-50'
                   : 'bg-white'
               }`}
             >
               <Icon className="mx-auto mb-2" />
-              <p>{plan.label}</p>
-              <p className="text-green-600">+{plan.return}%</p>
+              <p>{period.label}</p>
+              <p className="text-green-600">+{ret}%</p>
             </button>
           );
         })}
