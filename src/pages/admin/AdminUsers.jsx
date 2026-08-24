@@ -1,14 +1,11 @@
 // src/pages/admin/AdminUsers.jsx
 import React, { useState, useEffect } from 'react';
-import {
-  Users,
-  Search,
+import { 
+  Users, 
+  Search, 
   Edit,
-  Trash2,
   Shield,
-  Mail,
   Phone,
-  Calendar,
   MapPin,
   CheckCircle,
   XCircle,
@@ -19,7 +16,7 @@ import {
   ChevronRight,
   DollarSign,
   TrendingUp,
-  User,
+  User
 } from 'lucide-react';
 import { toast } from 'react-toastify';
 import axiosInstance from '../../utils/axios';
