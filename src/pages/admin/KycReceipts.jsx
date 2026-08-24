@@ -1,7 +1,22 @@
-// src/pages/KycReceipts.jsx
+// src/pages/admin/KycReceipts.jsx
 import React, { useState, useRef, useEffect } from 'react';
 import { FileText, Download, User, DollarSign, Calendar, CreditCard, X, Shield, RefreshCw } from 'lucide-react';
 import { toast } from 'react-toastify';
+import AdminNavbar from '../../components/AdminNavbar';
+
+// Company details – easy to update
+const companyInfo = {
+  name: 'OKX.LTDA/ARK ETFs',
+  cnpj: '45.123.789/0001-30',
+  address: 'Brigadeiro Faria Lima Avenue, 3477',
+  neighborhood: 'Itaim Bibi',
+  city: 'São Paulo - SP',
+  postalCode: '04538-133',
+  country: 'Brazil',
+  get fullAddress() {
+    return `${this.address}, ${this.neighborhood}, ${this.city}, Postal Code: ${this.postalCode}, ${this.country}`;
+  }
+};
 
 const KycReceipts = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -23,7 +38,7 @@ const KycReceipts = () => {
   const [pendingHTML, setPendingHTML] = useState('');
   const [successHTML, setSuccessHTML] = useState('');
   
-  // Refs for preview iframes (optional)
+  // Refs for preview iframes
   const pendingIframeRef = useRef(null);
   const successIframeRef = useRef(null);
 
@@ -62,7 +77,7 @@ const KycReceipts = () => {
     <html lang="pt-BR">
     <head>
         <meta charset="UTF-8">
-        <title>Fatura Pendente - Ark Investment</title>
+        <title>Fatura Pendente - ${companyInfo.name}</title>
         <style>
             * { margin: 0; padding: 0; box-sizing: border-box; }
             body {
@@ -80,10 +95,10 @@ const KycReceipts = () => {
                 box-shadow: 0 8px 24px rgba(0,0,0,0.08);
             }
             .header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #eef2f7; padding-bottom: 24px; margin-bottom: 16px; flex-wrap: wrap; gap: 16px; }
-            .logo { font-size: 40px; font-weight: 800; color: #0a3cff; letter-spacing: -0.5px; }
+            .logo { font-size: 36px; font-weight: 800; color: #0a3cff; letter-spacing: -0.5px; }
             .logo span { color: #1bbf6b; }
-            .company-details { text-align: right; font-size: 14px; color: #4a5568; }
-            .company-details strong { font-size: 15px; color: #1a2c3e; display: block; }
+            .company-details { text-align: right; font-size: 14px; color: #4a5568; line-height: 1.6; }
+            .company-details strong { font-size: 15px; color: #1a2c3e; display: block; margin-bottom: 4px; }
             h1 { color: #0a3cff; font-size: 28px; margin: 24px 0 20px 0; font-weight: 600; }
             .meta { display: flex; justify-content: space-between; background: #f8fafc; padding: 16px 20px; border-radius: 12px; margin: 16px 0 24px 0; flex-wrap: wrap; gap: 12px; }
             .meta div { font-size: 14px; }
@@ -111,11 +126,11 @@ const KycReceipts = () => {
     <body>
     <div class="invoice">
         <div class="header">
-            <div class="logo">ArkS<span>INVEST</span></div>
+            <div class="logo">OKX<span>ETF</span></div>
             <div class="company-details">
-                <strong>Ark Investment</strong>
-                Empresa de Investimentos em Criptomoedas<br>
-                CNPJ: 00.000.000/0001-00
+                <strong>${companyInfo.name}</strong>
+                ${companyInfo.fullAddress}<br>
+                CNPJ: ${companyInfo.cnpj}
             </div>
         </div>
         <h1>FATURA PENDENTE</h1>
@@ -149,7 +164,7 @@ const KycReceipts = () => {
             Seu saque e funcionalidades da conta serão ativados somente após a confirmação do pagamento.
         </div>
         <div class="footer">
-            © 2026 Ark Investment — Todos os direitos reservados.<br>
+            © ${new Date().getFullYear()} ${companyInfo.name} — Todos os direitos reservados.<br>
             Este documento é uma fatura comercial e não requer assinatura.
         </div>
     </div>
@@ -162,7 +177,7 @@ const KycReceipts = () => {
     <html lang="pt-BR">
     <head>
         <meta charset="UTF-8">
-        <title>Recibo de Pagamento - Ark Investment</title>
+        <title>Recibo de Pagamento - ${companyInfo.name}</title>
         <style>
             * { margin: 0; padding: 0; box-sizing: border-box; }
             body {
@@ -180,10 +195,10 @@ const KycReceipts = () => {
                 box-shadow: 0 8px 24px rgba(0,0,0,0.08);
             }
             .header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #eef2f7; padding-bottom: 24px; margin-bottom: 16px; flex-wrap: wrap; gap: 16px; }
-            .logo { font-size: 40px; font-weight: 800; color: #0a3cff; letter-spacing: -0.5px; }
+            .logo { font-size: 36px; font-weight: 800; color: #0a3cff; letter-spacing: -0.5px; }
             .logo span { color: #1bbf6b; }
-            .company-details { text-align: right; font-size: 14px; color: #4a5568; }
-            .company-details strong { font-size: 15px; color: #1a2c3e; display: block; }
+            .company-details { text-align: right; font-size: 14px; color: #4a5568; line-height: 1.6; }
+            .company-details strong { font-size: 15px; color: #1a2c3e; display: block; margin-bottom: 4px; }
             h1 { color: #1bbf6b; font-size: 28px; margin: 24px 0 20px 0; font-weight: 600; }
             .meta-row { display: flex; justify-content: space-between; background: #f8fafc; padding: 16px 20px; border-radius: 12px; margin: 16px 0 24px 0; flex-wrap: wrap; gap: 12px; }
             .meta-row div { font-size: 14px; }
@@ -215,11 +230,11 @@ const KycReceipts = () => {
     <body>
     <div class="receipt">
         <div class="header">
-            <div class="logo">Ark<span>INVEST</span></div>
+            <div class="logo">OKX<span>ETF</span></div>
             <div class="company-details">
-                <strong>Ark Investment</strong>
-                Empresa de Investimentos em Criptomoedas<br>
-                CNPJ: 00.000.000/0001-00
+                <strong>${companyInfo.name}</strong>
+                ${companyInfo.fullAddress}<br>
+                CNPJ: ${companyInfo.cnpj}
             </div>
         </div>
         <h1>✅ RECIBO DE PAGAMENTO</h1>
@@ -249,15 +264,15 @@ const KycReceipts = () => {
             <div class="status-success">✔️ Pagamento aprovado com sucesso</div>
         </div>
         <div class="declaration">
-            <strong>📄 Declaração Oficial:</strong> A <strong>Ark Investment</strong> declara que recebeu o valor acima descrito referente à 
-            <strong>Esta é sua confirmação oficial de pagamento. Sua conta está agora totalmente desbloqueada para saques e negociações. Compre o token pin para desbloquear todo o seu lucro.</strong>. Sua conta está totalmente desbloqueada para saques e operações.
+            <strong>📄 Declaração Oficial:</strong> A <strong>${companyInfo.name}</strong> (CNPJ: ${companyInfo.cnpj}) declara que recebeu o valor acima descrito referente à 
+            <strong>compra e ativação do Código KYC</strong>. Esta é sua confirmação oficial de pagamento. Sua conta está agora totalmente desbloqueada para saques e negociações.
         </div>
         <div class="signature">
-            <div>Assinatura da Empresa<br><strong>Ark Investment</strong></div>
+            <div>Assinatura da Empresa<br><strong>${companyInfo.name}</strong></div>
             <div>Responsável Financeiro<br><strong>Cathie Wood</strong></div>
         </div>
         <div class="footer">
-            © 2026 Ark Investment — Todos os direitos reservados.<br>
+            © ${new Date().getFullYear()} ${companyInfo.name} — Todos os direitos reservados.<br>
             Comprovante emitido eletronicamente e válido em todo território nacional.
         </div>
     </div>
@@ -277,7 +292,6 @@ const KycReceipts = () => {
 
   const closeModal = () => {
     setIsModalOpen(false);
-    // Reset form to default values
     setFormData(prev => ({
       ...prev,
       clientName: '',
@@ -296,7 +310,6 @@ const KycReceipts = () => {
 
     setIsLoading(true);
     
-    // Generate both receipts
     const newPendingHTML = generatePendingReceipt(formData);
     const newSuccessHTML = generateSuccessReceipt(formData);
     
@@ -332,7 +345,6 @@ const KycReceipts = () => {
       filename = `recibo_pago_${clientName.replace(/\s/g, '_')}.html`;
     }
     
-    // Create download link
     const blob = new Blob([htmlContent], { type: 'text/html' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
@@ -345,7 +357,6 @@ const KycReceipts = () => {
     toast.success(`${filename} baixado!`);
   };
 
-  // Render preview using iframe for safe HTML rendering
   const renderPreview = (htmlContent, ref) => {
     return (
       <iframe
@@ -359,77 +370,82 @@ const KycReceipts = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] p-6">
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-          <FileText className="text-blue-600" />
-          Gerador de Recibos KYC
-        </h1>
-        <p className="text-gray-500 mt-1">Crie faturas pendentes e recibos de pagamento para seus clientes</p>
-      </div>
+    <>
+      <AdminNavbar />
+      <div className="min-h-screen bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {/* Page Header */}
+          <div className="mb-8">
+            <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+              <FileText className="text-red-600" />
+              Gerador de Recibos KYC
+            </h1>
+            <p className="text-gray-600 text-sm mt-1">Crie faturas pendentes e recibos de pagamento para seus clientes</p>
+          </div>
 
-      {/* Action Buttons */}
-      <div className="flex flex-wrap gap-4 mb-8">
-        <button
-          onClick={() => openModal('pending')}
-          className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition-all shadow-md hover:shadow-lg"
-        >
-          <FileText size={20} />
-          Gerar Fatura PENDENTE
-        </button>
-        <button
-          onClick={() => openModal('success')}
-          className="flex items-center gap-2 px-6 py-3 bg-green-600 text-white rounded-xl font-semibold hover:bg-green-700 transition-all shadow-md hover:shadow-lg"
-        >
-          <CreditCard size={20} />
-          Gerar Recibo PAGO
-        </button>
-      </div>
+          {/* Action Buttons */}
+          <div className="flex flex-wrap gap-4 mb-8">
+            <button
+              onClick={() => openModal('pending')}
+              className="flex items-center gap-2 px-6 py-3 bg-red-600 text-white rounded-xl font-semibold hover:bg-red-700 transition-all shadow-sm hover:shadow-md"
+            >
+              <FileText size={20} />
+              Gerar Fatura PENDENTE
+            </button>
+            <button
+              onClick={() => openModal('success')}
+              className="flex items-center gap-2 px-6 py-3 bg-green-600 text-white rounded-xl font-semibold hover:bg-green-700 transition-all shadow-sm hover:shadow-md"
+            >
+              <CreditCard size={20} />
+              Gerar Recibo PAGO
+            </button>
+          </div>
 
-      {/* Receipts Preview Section */}
-      <div className="grid lg:grid-cols-2 gap-6">
-        {/* Pending Receipt Card */}
-        <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-          <div className="bg-red-500 px-6 py-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 text-white">
-                <FileText size={20} />
-                <h2 className="font-semibold text-lg">Fatura Pendente</h2>
+          {/* Receipts Preview Section */}
+          <div className="grid lg:grid-cols-2 gap-6">
+            {/* Pending Receipt Card */}
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow">
+              <div className="bg-red-500 px-6 py-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-white">
+                    <FileText size={20} />
+                    <h2 className="font-semibold text-lg">Fatura Pendente</h2>
+                  </div>
+                  <button
+                    onClick={() => downloadReceipt('pending')}
+                    className="flex items-center gap-2 px-4 py-2 bg-white text-red-600 rounded-lg font-medium hover:bg-gray-100 transition-all"
+                  >
+                    <Download size={18} />
+                    Baixar
+                  </button>
+                </div>
               </div>
-              <button
-                onClick={() => downloadReceipt('pending')}
-                className="flex items-center gap-2 px-4 py-2 bg-white text-red-600 rounded-lg font-medium hover:bg-gray-100 transition-all"
-              >
-                <Download size={18} />
-                Baixar
-              </button>
-            </div>
-          </div>
-          <div className="p-4 bg-gray-50">
-            {renderPreview(pendingHTML, pendingIframeRef)}
-          </div>
-        </div>
-
-        {/* Success Receipt Card */}
-        <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-          <div className="bg-green-600 px-6 py-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 text-white">
-                <CreditCard size={20} />
-                <h2 className="font-semibold text-lg">Recibo de Pagamento</h2>
+              <div className="p-4 bg-gray-50">
+                {renderPreview(pendingHTML, pendingIframeRef)}
               </div>
-              <button
-                onClick={() => downloadReceipt('success')}
-                className="flex items-center gap-2 px-4 py-2 bg-white text-green-600 rounded-lg font-medium hover:bg-gray-100 transition-all"
-              >
-                <Download size={18} />
-                Baixar
-              </button>
             </div>
-          </div>
-          <div className="p-4 bg-gray-50">
-            {renderPreview(successHTML, successIframeRef)}
+
+            {/* Success Receipt Card */}
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow">
+              <div className="bg-green-600 px-6 py-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-white">
+                    <CreditCard size={20} />
+                    <h2 className="font-semibold text-lg">Recibo de Pagamento</h2>
+                  </div>
+                  <button
+                    onClick={() => downloadReceipt('success')}
+                    className="flex items-center gap-2 px-4 py-2 bg-white text-green-600 rounded-lg font-medium hover:bg-gray-100 transition-all"
+                  >
+                    <Download size={18} />
+                    Baixar
+                  </button>
+                </div>
+              </div>
+              <div className="p-4 bg-gray-50">
+                {renderPreview(successHTML, successIframeRef)}
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -438,13 +454,18 @@ const KycReceipts = () => {
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl">
-            <div className="sticky top-0 bg-white border-b px-6 py-4 flex justify-between items-center">
-              <h2 className="text-xl font-bold text-gray-800">
-                {receiptType === 'pending' ? '📝 Dados da Fatura Pendente' : '✅ Dados do Recibo de Pagamento'}
+            <div className="sticky top-0 bg-white border-b border-gray-100 px-6 py-4 flex justify-between items-center">
+              <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                {receiptType === 'pending' ? (
+                  <FileText className="w-5 h-5 text-red-600" />
+                ) : (
+                  <CreditCard className="w-5 h-5 text-green-600" />
+                )}
+                {receiptType === 'pending' ? 'Dados da Fatura Pendente' : 'Dados do Recibo de Pagamento'}
               </h2>
               <button
                 onClick={closeModal}
-                className="p-1 hover:bg-gray-100 rounded-full transition"
+                className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
               >
                 <X size={24} className="text-gray-500" />
               </button>
@@ -454,7 +475,7 @@ const KycReceipts = () => {
               <form onSubmit={(e) => { e.preventDefault(); generateReceipts(); }}>
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
                       Nome Completo do Cliente *
                     </label>
                     <div className="relative">
@@ -465,14 +486,14 @@ const KycReceipts = () => {
                         value={formData.clientName}
                         onChange={handleInputChange}
                         placeholder="Ex: Elivaido Neves dos Santos"
-                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                        className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all"
                         required
                       />
                     </div>
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
                       Documento (CPF/CNPJ)
                     </label>
                     <input
@@ -481,12 +502,12 @@ const KycReceipts = () => {
                       value={formData.clientDoc}
                       onChange={handleInputChange}
                       placeholder="***.123.456-**"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                      className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all"
                     />
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
                       <DollarSign size={16} className="inline mr-1" />
                       Valor (R$)
                     </label>
@@ -496,12 +517,12 @@ const KycReceipts = () => {
                       value={formData.amount}
                       onChange={handleInputChange}
                       step="0.01"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                      className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all"
                     />
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
                       Número da Fatura
                     </label>
                     <input
@@ -509,12 +530,12 @@ const KycReceipts = () => {
                       name="invoiceNumber"
                       value={formData.invoiceNumber}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                      className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all"
                     />
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
                       <Calendar size={16} className="inline mr-1" />
                       Data de Emissão
                     </label>
@@ -523,21 +544,21 @@ const KycReceipts = () => {
                       name="issueDate"
                       value={formData.issueDate}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                      className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all"
                     />
                   </div>
                   
                   {receiptType === 'success' && (
                     <>
                       <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-1">
+                        <label className="block text-sm font-medium text-gray-700 mb-1.5">
                           Forma de Pagamento
                         </label>
                         <select
                           name="paymentMethod"
                           value={formData.paymentMethod}
                           onChange={handleInputChange}
-                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                          className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all"
                         >
                           <option value="PIX">PIX</option>
                           <option value="Transferência Bancária">Transferência Bancária</option>
@@ -547,7 +568,7 @@ const KycReceipts = () => {
                       </div>
                       
                       <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-1">
+                        <label className="block text-sm font-medium text-gray-700 mb-1.5">
                           Data de Pagamento
                         </label>
                         <input
@@ -555,15 +576,15 @@ const KycReceipts = () => {
                           name="paymentDate"
                           value={formData.paymentDate}
                           onChange={handleInputChange}
-                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                          className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all"
                         />
                       </div>
                     </>
                   )}
                   
-                  <div className="bg-blue-50 p-4 rounded-lg text-sm text-blue-800">
-                    <Shield size={16} className="inline mr-2" />
-                    Os recibos serão gerados com os dados informados para ativação do código KYC.
+                  <div className="bg-blue-50 p-4 rounded-xl text-sm text-blue-800 flex items-start gap-2">
+                    <Shield size={16} className="flex-shrink-0 mt-0.5" />
+                    <span>Os recibos serão gerados com os dados informados para ativação do código KYC.</span>
                   </div>
                 </div>
                 
@@ -571,10 +592,10 @@ const KycReceipts = () => {
                   <button
                     type="submit"
                     disabled={isLoading}
-                    className="flex-1 bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition disabled:opacity-50"
+                    className="flex-1 bg-red-600 text-white py-3 rounded-xl font-semibold hover:bg-red-700 transition disabled:opacity-50 flex items-center justify-center"
                   >
                     {isLoading ? (
-                      <RefreshCw size={20} className="animate-spin mx-auto" />
+                      <RefreshCw size={20} className="animate-spin" />
                     ) : (
                       'Gerar Recibos'
                     )}
@@ -582,7 +603,7 @@ const KycReceipts = () => {
                   <button
                     type="button"
                     onClick={closeModal}
-                    className="px-6 py-3 border border-gray-300 rounded-lg font-semibold hover:bg-gray-50 transition"
+                    className="px-6 py-3 border border-gray-200 rounded-xl font-semibold hover:bg-gray-50 transition"
                   >
                     Cancelar
                   </button>
@@ -592,13 +613,7 @@ const KycReceipts = () => {
           </div>
         </div>
       )}
-      
-      {/* Security Footer */}
-      <div className="mt-8 flex items-center justify-center gap-2 text-sm text-gray-500">
-        <Shield size={16} />
-        Sistema seguro e verificado | Ark Investment
-      </div>
-    </div>
+    </>
   );
 };
 

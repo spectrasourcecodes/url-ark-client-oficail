@@ -1,4 +1,4 @@
-// src/pages/admin/Users.jsx
+// src/pages/admin/AdminUsers.jsx
 import React, { useState, useEffect } from 'react';
 import { 
   Users, 
@@ -18,10 +18,12 @@ import {
   ChevronLeft,
   ChevronRight,
   DollarSign,
-  TrendingUp
+  TrendingUp,
+  User
 } from 'lucide-react';
 import { toast } from 'react-toastify';
 import axiosInstance from '../../utils/axios';
+import AdminNavbar from '../../components/AdminNavbar';
 
 const AdminUsers = () => {
   const [loading, setLoading] = useState(true);
@@ -148,223 +150,236 @@ const AdminUsers = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-8 py-4">
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">User Management</h1>
-            <p className="text-gray-600 text-sm mt-1">
-              Total Users: {wallets.length} | Total Balance: {formatCurrency(wallets.reduce((sum, w) => sum + (w.balance || 0), 0))}
-            </p>
-          </div>
-          <button
-            onClick={() => fetchWallets(true)}
-            disabled={refreshing}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-          >
-            <RefreshCw className={`w-5 h-5 text-gray-600 ${refreshing ? 'animate-spin' : ''}`} />
-          </button>
-        </div>
-      </div>
-
-      <div className="p-8">
-        {/* Search */}
-        <div className="mb-6">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-            <input
-              type="text"
-              placeholder="Search by name, email, phone, or country..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20"
-            />
-          </div>
-        </div>
-
-        {/* Users Table */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
-                <tr>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase">User</th>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase">Contact</th>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase">Balance</th>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase">KYC</th>
-                  <th className="px-6 py-4 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {currentWallets.map((wallet) => {
-                  const user = wallet.user || {};
-                  return (
-                    <tr key={wallet._id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4">
-                        <div className="flex items-center">
-                          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-semibold">
-                            {user.fullName?.charAt(0) || 'U'}
-                          </div>
-                          <div className="ml-3">
-                            <div className="font-medium text-gray-900">{user.fullName || 'Unknown'}</div>
-                            <div className="text-sm text-gray-500">{user.email || 'No email'}</div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        {user.phone && (
-                          <div className="flex items-center text-sm text-gray-600">
-                            <Phone className="w-4 h-4 mr-2 text-gray-400" />
-                            {user.phone}
-                          </div>
-                        )}
-                        {user.country && (
-                          <div className="flex items-center text-sm text-gray-600 mt-1">
-                            <MapPin className="w-4 h-4 mr-2 text-gray-400" />
-                            {user.country}
-                          </div>
-                        )}
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="text-sm">
-                          <div className="font-medium text-gray-900">{formatCurrency(wallet.balance)}</div>
-                          <div className={`text-xs ${wallet.profit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                            Profit: {wallet.profit >= 0 ? '+' : ''}{formatCurrency(wallet.profit)}
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        {wallet.kyc ? (
-                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                            <CheckCircle className="w-3 h-3 mr-1" />
-                            Approved
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                            <XCircle className="w-3 h-3 mr-1" />
-                            Pending
-                          </span>
-                        )}
-                      </td>
-                      <td className="px-6 py-4 text-right">
-                        <div className="flex items-center justify-end space-x-2">
-                          <button
-                            onClick={() => handleToggleKYC(wallet._id, wallet.kyc)}
-                            className="p-2 hover:bg-gray-100 rounded-lg"
-                            title={wallet.kyc ? 'Revoke KYC' : 'Approve KYC'}
-                          >
-                            <Shield className={`w-4 h-4 ${wallet.kyc ? 'text-green-600' : 'text-gray-400'}`} />
-                          </button>
-                          <button
-                            onClick={() => handleEditWallet(wallet)}
-                            className="p-2 hover:bg-gray-100 rounded-lg"
-                            title="Edit Wallet"
-                          >
-                            <Edit className="w-4 h-4 text-blue-600" />
-                          </button>
-                          <button
-                            onClick={() => handleViewWallet(wallet)}
-                            className="p-2 hover:bg-gray-100 rounded-lg"
-                            title="View Details"
-                          >
-                            <Eye className="w-4 h-4 text-gray-600" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-
-          {filteredWallets.length === 0 && (
-            <div className="text-center py-12">
-              <Users className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-500">No users found</p>
-            </div>
-          )}
-
-          {/* Pagination */}
-          {filteredWallets.length > 0 && (
-            <div className="px-6 py-4 border-t flex items-center justify-between">
-              <p className="text-sm text-gray-500">
-                Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, filteredWallets.length)} of {filteredWallets.length}
+    <>
+      <AdminNavbar />
+      <div className="min-h-screen bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {/* Page Header */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">User Management</h1>
+              <p className="text-gray-600 text-sm mt-1">
+                Total Users: {wallets.length} • Total Balance: {formatCurrency(wallets.reduce((sum, w) => sum + (w.balance || 0), 0))}
               </p>
-              <div className="flex items-center space-x-2">
-                <button
-                  onClick={() => setCurrentPage(p => Math.max(p - 1, 1))}
-                  disabled={currentPage === 1}
-                  className="p-2 border rounded-lg hover:bg-gray-50 disabled:opacity-50"
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                </button>
-                <span className="px-4 py-2 text-sm">Page {currentPage} of {totalPages}</span>
-                <button
-                  onClick={() => setCurrentPage(p => Math.min(p + 1, totalPages))}
-                  disabled={currentPage === totalPages}
-                  className="p-2 border rounded-lg hover:bg-gray-50 disabled:opacity-50"
-                >
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              </div>
             </div>
-          )}
+            <button
+              onClick={() => fetchWallets(true)}
+              disabled={refreshing}
+              className="mt-4 sm:mt-0 flex items-center space-x-2 px-4 py-2 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors shadow-sm"
+            >
+              <RefreshCw className={`w-4 h-4 text-gray-600 ${refreshing ? 'animate-spin' : ''}`} />
+              <span className="text-sm font-medium text-gray-700">Refresh</span>
+            </button>
+          </div>
+
+          {/* Search */}
+          <div className="mb-6">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <input
+                type="text"
+                placeholder="Search by name, email, phone, or country..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all"
+              />
+            </div>
+          </div>
+
+          {/* Users Table */}
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50 border-b border-gray-200">
+                  <tr>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Balance</th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">KYC</th>
+                    <th className="px-6 py-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {currentWallets.map((wallet) => {
+                    const user = wallet.user || {};
+                    return (
+                      <tr key={wallet._id} className="hover:bg-gray-50 transition-colors">
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center">
+                            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-semibold text-sm">
+                              {user.fullName?.charAt(0) || 'U'}
+                            </div>
+                            <div className="ml-3">
+                              <div className="font-medium text-gray-900">{user.fullName || 'Unknown'}</div>
+                              <div className="text-sm text-gray-500">{user.email || 'No email'}</div>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          {user.phone && (
+                            <div className="flex items-center text-sm text-gray-600">
+                              <Phone className="w-4 h-4 mr-2 text-gray-400" />
+                              {user.phone}
+                            </div>
+                          )}
+                          {user.country && (
+                            <div className="flex items-center text-sm text-gray-600 mt-1">
+                              <MapPin className="w-4 h-4 mr-2 text-gray-400" />
+                              {user.country}
+                            </div>
+                          )}
+                          {!user.phone && !user.country && (
+                            <span className="text-sm text-gray-400">No details</span>
+                          )}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm">
+                            <div className="font-medium text-gray-900">{formatCurrency(wallet.balance)}</div>
+                            <div className={`text-xs ${wallet.profit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                              Profit: {wallet.profit >= 0 ? '+' : ''}{formatCurrency(wallet.profit)}
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          {wallet.kyc ? (
+                            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                              <CheckCircle className="w-3 h-3 mr-1" />
+                              Verified
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                              <XCircle className="w-3 h-3 mr-1" />
+                              Pending
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          <div className="flex items-center justify-end space-x-1">
+                            <button
+                              onClick={() => handleToggleKYC(wallet._id, wallet.kyc)}
+                              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                              title={wallet.kyc ? 'Revoke KYC' : 'Approve KYC'}
+                            >
+                              <Shield className={`w-4 h-4 ${wallet.kyc ? 'text-green-600' : 'text-gray-400'}`} />
+                            </button>
+                            <button
+                              onClick={() => handleEditWallet(wallet)}
+                              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                              title="Edit Wallet"
+                            >
+                              <Edit className="w-4 h-4 text-blue-600" />
+                            </button>
+                            <button
+                              onClick={() => handleViewWallet(wallet)}
+                              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                              title="View Details"
+                            >
+                              <Eye className="w-4 h-4 text-gray-600" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+
+            {filteredWallets.length === 0 && (
+              <div className="text-center py-12">
+                <Users className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-500">No users found</p>
+              </div>
+            )}
+
+            {/* Pagination */}
+            {filteredWallets.length > 0 && (
+              <div className="px-6 py-4 border-t border-gray-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <p className="text-sm text-gray-500">
+                  Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, filteredWallets.length)} of {filteredWallets.length}
+                </p>
+                <div className="flex items-center space-x-2">
+                  <button
+                    onClick={() => setCurrentPage(p => Math.max(p - 1, 1))}
+                    disabled={currentPage === 1}
+                    className="p-2 border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                  </button>
+                  <span className="px-4 py-2 text-sm bg-gray-50 rounded-lg">
+                    Page {currentPage} of {totalPages}
+                  </span>
+                  <button
+                    onClick={() => setCurrentPage(p => Math.min(p + 1, totalPages))}
+                    disabled={currentPage === totalPages}
+                    className="p-2 border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
       {/* View Wallet Modal */}
       {isViewModalOpen && selectedWallet && (
-        <div className="fixed inset-0 z-50">
-          <div className="fixed inset-0 bg-black/50" onClick={() => setIsViewModalOpen(false)} />
-          <div className="fixed inset-0 flex items-center justify-center p-4">
-            <div className="bg-white rounded-2xl max-w-md w-full p-6">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-xl font-bold">User Details</h3>
-                <button onClick={() => setIsViewModalOpen(false)}>
-                  <X className="w-5 h-5" />
-                </button>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setIsViewModalOpen(false)} />
+          <div className="relative bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-bold text-gray-900 flex items-center">
+                <User className="w-5 h-5 mr-2 text-red-600" />
+                User Details
+              </h3>
+              <button 
+                onClick={() => setIsViewModalOpen(false)}
+                className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <X className="w-5 h-5 text-gray-500" />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div className="flex items-center space-x-3">
+                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                  {selectedWallet.user?.fullName?.charAt(0) || 'U'}
+                </div>
+                <div>
+                  <h4 className="font-semibold text-gray-900">{selectedWallet.user?.fullName || 'Unknown'}</h4>
+                  <p className="text-sm text-gray-500">{selectedWallet.user?.email || 'No email'}</p>
+                </div>
               </div>
 
-              <div className="space-y-4">
-                <div className="flex items-center space-x-3">
-                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-lg">
-                    {selectedWallet.user?.fullName?.charAt(0) || 'U'}
-                  </div>
-                  <div>
-                    <h4 className="font-semibold">{selectedWallet.user?.fullName || 'Unknown'}</h4>
-                    <p className="text-sm text-gray-500">{selectedWallet.user?.email || 'No email'}</p>
-                  </div>
+              <div className="grid grid-cols-2 gap-4 pt-2">
+                <div>
+                  <p className="text-sm text-gray-500">Phone</p>
+                  <p className="font-medium text-gray-900">{selectedWallet.user?.phone || 'Not Added'}</p>
                 </div>
-
-                <div className="grid grid-cols-2 gap-4 pt-2">
-                  <div>
-                    <p className="text-sm text-gray-500">Phone</p>
-                    <p className="font-medium">{selectedWallet.user?.phone || 'Not Added'}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500">Country</p>
-                    <p className="font-medium">{selectedWallet.user?.country || 'Not Added'}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500">Balance</p>
-                    <p className="font-medium text-blue-600">{formatCurrency(selectedWallet.balance)}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500">Profit</p>
-                    <p className={`font-medium ${selectedWallet.profit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                      {selectedWallet.profit >= 0 ? '+' : ''}{formatCurrency(selectedWallet.profit)}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500">KYC</p>
-                    <p className="font-medium">{selectedWallet.kyc ? 'Verified' : 'Pending'}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500">Joined</p>
-                    <p className="font-medium">{formatDate(selectedWallet.user?.createdAt)}</p>
-                  </div>
+                <div>
+                  <p className="text-sm text-gray-500">Country</p>
+                  <p className="font-medium text-gray-900">{selectedWallet.user?.country || 'Not Added'}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Balance</p>
+                  <p className="font-medium text-blue-600">{formatCurrency(selectedWallet.balance)}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Profit</p>
+                  <p className={`font-medium ${selectedWallet.profit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    {selectedWallet.profit >= 0 ? '+' : ''}{formatCurrency(selectedWallet.profit)}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">KYC</p>
+                  <p className={`font-medium ${selectedWallet.kyc ? 'text-green-600' : 'text-yellow-600'}`}>
+                    {selectedWallet.kyc ? 'Verified' : 'Pending'}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Joined</p>
+                  <p className="font-medium text-gray-900">{formatDate(selectedWallet.user?.createdAt)}</p>
                 </div>
               </div>
             </div>
@@ -374,86 +389,90 @@ const AdminUsers = () => {
 
       {/* Edit Wallet Modal */}
       {isEditModalOpen && selectedWallet && (
-        <div className="fixed inset-0 z-50">
-          <div className="fixed inset-0 bg-black/50" onClick={() => setIsEditModalOpen(false)} />
-          <div className="fixed inset-0 flex items-center justify-center p-4">
-            <div className="bg-white rounded-2xl max-w-md w-full p-6">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-xl font-bold">Update Wallet</h3>
-                <button onClick={() => setIsEditModalOpen(false)}>
-                  <X className="w-5 h-5" />
-                </button>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setIsEditModalOpen(false)} />
+          <div className="relative bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-bold text-gray-900 flex items-center">
+                <Edit className="w-5 h-5 mr-2 text-red-600" />
+                Update Wallet
+              </h3>
+              <button 
+                onClick={() => setIsEditModalOpen(false)}
+                className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <X className="w-5 h-5 text-gray-500" />
+              </button>
+            </div>
+
+            <form onSubmit={handleUpdateWallet} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  User: <span className="font-semibold">{selectedWallet.user?.fullName}</span>
+                </label>
               </div>
 
-              <form onSubmit={handleUpdateWallet} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    User: {selectedWallet.user?.fullName}
-                  </label>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Balance (USD)</label>
-                  <div className="relative">
-                    <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-                    <input
-                      type="number"
-                      value={walletForm.balance}
-                      onChange={(e) => setWalletForm({...walletForm, balance: parseFloat(e.target.value) || 0})}
-                      className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20"
-                      step="0.01"
-                      min="0"
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Profit (USD)</label>
-                  <div className="relative">
-                    <TrendingUp className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-                    <input
-                      type="number"
-                      value={walletForm.profit}
-                      onChange={(e) => setWalletForm({...walletForm, profit: parseFloat(e.target.value) || 0})}
-                      className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20"
-                      step="0.01"
-                    />
-                  </div>
-                </div>
-
-                <div className="flex items-center space-x-2">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Balance (USD)</label>
+                <div className="relative">
+                  <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
                   <input
-                    type="checkbox"
-                    id="kyc"
-                    checked={walletForm.kyc}
-                    onChange={(e) => setWalletForm({...walletForm, kyc: e.target.checked})}
-                    className="w-4 h-4 text-red-600 rounded"
+                    type="number"
+                    value={walletForm.balance}
+                    onChange={(e) => setWalletForm({...walletForm, balance: parseFloat(e.target.value) || 0})}
+                    className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all"
+                    step="0.01"
+                    min="0"
+                    required
                   />
-                  <label htmlFor="kyc" className="text-sm text-gray-700">KYC Approved</label>
                 </div>
+              </div>
 
-                <div className="flex space-x-3 pt-4">
-                  <button
-                    type="button"
-                    onClick={() => setIsEditModalOpen(false)}
-                    className="flex-1 px-4 py-3 border border-gray-200 rounded-xl hover:bg-gray-50"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="flex-1 bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-xl"
-                  >
-                    Update Wallet
-                  </button>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Profit (USD)</label>
+                <div className="relative">
+                  <TrendingUp className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+                  <input
+                    type="number"
+                    value={walletForm.profit}
+                    onChange={(e) => setWalletForm({...walletForm, profit: parseFloat(e.target.value) || 0})}
+                    className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all"
+                    step="0.01"
+                  />
                 </div>
-              </form>
-            </div>
+              </div>
+
+              <div className="flex items-center space-x-3">
+                <input
+                  type="checkbox"
+                  id="kyc"
+                  checked={walletForm.kyc}
+                  onChange={(e) => setWalletForm({...walletForm, kyc: e.target.checked})}
+                  className="w-4 h-4 text-red-600 rounded focus:ring-red-500"
+                />
+                <label htmlFor="kyc" className="text-sm font-medium text-gray-700">KYC Approved</label>
+              </div>
+
+              <div className="flex space-x-3 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setIsEditModalOpen(false)}
+                  className="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors text-sm font-medium"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 bg-red-600 hover:bg-red-700 text-white font-semibold py-2.5 px-6 rounded-xl transition-colors"
+                >
+                  Update Wallet
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 };
 
