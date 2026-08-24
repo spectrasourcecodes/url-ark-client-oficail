@@ -2,8 +2,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { 
-  LayoutDashboard, Users, Shield, User, LogOut, Menu, X,
-  ChevronDown
+  LayoutDashboard, Users, Shield, User, LogOut, Menu, X
 } from 'lucide-react';
 import { toast } from 'react-toastify';
 
@@ -14,9 +13,7 @@ const AdminNavbar = () => {
 
   const handleLogout = async () => {
     try {
-      // Clear admin token (adjust according to your auth storage)
       localStorage.removeItem('adminToken');
-      // Optionally call admin logout API
       toast.success('Logged out successfully');
       navigate('/admin/login');
     } catch (error) {
@@ -28,15 +25,15 @@ const AdminNavbar = () => {
     { path: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { path: '/admin/users', label: 'Users', icon: Users },
     { path: '/admin/kyc-receipts', label: 'KYC Receipts', icon: Shield },
-    { path: '/admin/profile', label: 'Profile', icon: User },
+    { path: '#', label: 'Profile', icon: User },
   ];
 
   const isActive = (path) => location.pathname === path;
 
   return (
     <>
-      {/* Desktop Navbar */}
-      <nav className="bg-white border-b border-gray-200 shadow-sm hidden md:block sticky top-0 z-50">
+      {/* Desktop Navbar - NOT sticky */}
+      <nav className="bg-white border-b border-gray-200 shadow-sm hidden md:block relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
@@ -73,8 +70,8 @@ const AdminNavbar = () => {
         </div>
       </nav>
 
-      {/* Mobile Navbar */}
-      <nav className="bg-white border-b border-gray-200 shadow-sm md:hidden sticky top-0 z-50">
+      {/* Mobile Navbar - NOT sticky */}
+      <nav className="bg-white border-b border-gray-200 shadow-sm md:hidden relative">
         <div className="px-4 py-3 flex justify-between items-center">
           <Link to="/admin/dashboard" className="flex items-center space-x-2">
             <span className="text-xl font-bold bg-gradient-to-r from-red-600 to-red-800 text-transparent bg-clip-text">
