@@ -4,7 +4,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   Menu, X, Home, TrendingUp, Wallet, User, LogOut, 
   CreditCard, LayoutDashboard, MessageCircle, 
-  Bell, Settings, RefreshCw, Eye, EyeOff, Search
+  Settings, RefreshCw, Search
 } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { useAuth } from '../context/AuthContext';
@@ -13,11 +13,7 @@ const Navbar = () => {
   const navigate = useNavigate();
   const { isAuthenticated, logout, user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
-  const [showBalance, setShowBalance] = useState(true);
   const location = useLocation();
-
-  // Check if current page is dashboard
-  const isDashboard = location.pathname === '/dashboard';
 
   const supportLink = import.meta.env.VITE_SUPPORT_LINK
 
@@ -137,29 +133,13 @@ const Navbar = () => {
 
               {isAuthenticated && (
                 <>
-                  {/* Search button */}
+                  {/* Search button - only icon remains */}
                   <button 
                     onClick={handleSearch}
                     className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
                     title="Buscar"
                   >
                     <Search className="w-5 h-5 text-gray-600" />
-                  </button>
-
-                  {/* Balance toggle on desktop */}
-                  {isDashboard && (
-                    <button 
-                      onClick={() => setShowBalance(!showBalance)}
-                      className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                      title={showBalance ? "Ocultar saldo" : "Mostrar saldo"}
-                    >
-                      {showBalance ? <Eye className="w-4 h-4 text-gray-600" /> : <EyeOff className="w-4 h-4 text-gray-600" />}
-                    </button>
-                  )}
-                  
-                  <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors relative">
-                    <Bell className="w-5 h-5 text-gray-600" />
-                    <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
                   </button>
                   
                   <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
@@ -208,20 +188,6 @@ const Navbar = () => {
                   className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
                 >
                   <Search className="w-5 h-5 text-gray-600" />
-                </button>
-
-                {isDashboard && (
-                  <button 
-                    onClick={() => setShowBalance(!showBalance)}
-                    className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                  >
-                    {showBalance ? <Eye className="w-5 h-5 text-gray-600" /> : <EyeOff className="w-5 h-5 text-gray-600" />}
-                  </button>
-                )}
-                
-                <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors relative">
-                  <Bell className="w-5 h-5 text-gray-600" />
-                  <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
                 </button>
               </>
             )}
