@@ -393,7 +393,7 @@ const Withdraw = () => {
       {/* Page Header - Just the title and actions */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 pb-2">
         <div className="flex items-center justify-between">
-          <h1 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+          <h1 className="text-xl sm:text-2xl font-bold bg-black bg-clip-text text-transparent">
             Sacar Fundos
           </h1>
           <div className="flex items-center space-x-2">
@@ -404,9 +404,9 @@ const Withdraw = () => {
             >
               <RefreshCw className={`w-5 h-5 text-gray-600 ${refreshing ? 'animate-spin' : ''}`} />
             </button>
-            <Link to="/history" className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+            {/* <Link to="/history" className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
               <History className="w-5 h-5 text-gray-600" />
-            </Link>
+            </Link> */}
           </div>
         </div>
       </div>
