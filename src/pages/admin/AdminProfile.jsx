@@ -1,7 +1,7 @@
 // src/pages/admin/AdminProfile.jsx
 import React, { useState, useEffect } from 'react';
 import { 
-  User, 
+  User,
   Mail, 
   Phone, 
   Lock, 
