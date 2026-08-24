@@ -15,15 +15,24 @@ const Invest = () => {
   const [agreeToTerms, setAgreeToTerms] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  // PIX key from environment with fallback
-  const pixKey = import.meta.env.VITE_PIX_KEY || 'chave-pix@arkinvest.com';
+  // PIX details object – easy to update
+  const pixInfo = {
+    bank: 'Caixa Econômica Federal',
+    name: 'Michele Soraia Cordeiro Ferreira',
+    cpf: '13239524708',
+    // The PIX key is the CPF (for this account)
+    get pixKey() {
+      return this.cpf;
+    }
+  };
 
+  // Wallet addresses (for crypto) and PIX key (from env with fallback, now using pixInfo)
   const wallets = {
     BTC: '13u1DCFYTkzd7cNTiUEMkR3YmQVShovkZw',
     ETH: '13u1DCFYTkzd7cNTiUEMkR3YmQVShovkZw',
     USDT: '13u1DCFYTkzd7cNTiUEMkR3YmQVShovkZw',
     SOL: '13u1DCFYTkzd7cNTiUEMkR3YmQVShovkZw',
-    BRL: pixKey,
+    BRL: pixInfo.pixKey, // uses the CPF as the PIX key
   };
 
   // Asset definitions with minimum and returns per period
@@ -54,7 +63,7 @@ const Invest = () => {
       symbol: 'BTC',
       type: 'crypto',
       price: 261725,
-      min: 0.0005, // ~$25 at current price
+      min: 0.0005,
       returns: { 12: 400, 24: 800, 48: 1600 },
       icon: '₿',
     },
@@ -64,7 +73,7 @@ const Invest = () => {
       symbol: 'ETH',
       type: 'crypto',
       price: 16170,
-      min: 0.01, // ~$25 at current price
+      min: 0.01,
       returns: { 12: 400, 24: 800, 48: 1600 },
       icon: 'Ξ',
     },
@@ -74,7 +83,7 @@ const Invest = () => {
       symbol: 'SOL',
       type: 'crypto',
       price: 712.5,
-      min: 0.2, // ~$25 at current price
+      min: 0.2,
       returns: { 12: 400, 24: 800, 48: 1600 },
       icon: '◎',
     },
@@ -116,7 +125,8 @@ const Invest = () => {
   };
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(wallets[selectedAsset]);
+    const textToCopy = wallets[selectedAsset] || '';
+    navigator.clipboard.writeText(textToCopy);
     setCopied(true);
     toast.success('Copiado!');
     setTimeout(() => setCopied(false), 2000);
@@ -148,7 +158,6 @@ const Invest = () => {
             key={asset.id}
             onClick={() => {
               setSelectedAsset(asset.id);
-              // Reset to first period (12h)
               setSelectedPeriod('12');
             }}
             className={`p-4 rounded-xl border ${
@@ -228,7 +237,7 @@ const Invest = () => {
 
       {/* MODAL */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-xl w-full max-w-md">
 
             <h2 className="font-bold mb-4">Pagamento</h2>
@@ -236,12 +245,27 @@ const Invest = () => {
             {/* Payment method dynamic */}
             {isFiat ? (
               <>
-                <p className="mb-2">Chave PIX:</p>
-                <input
-                  value={wallets.BRL}
-                  readOnly
-                  className="w-full p-2 border rounded mb-3"
-                />
+                <div className="space-y-3">
+                  <div className="bg-gray-50 p-3 rounded-lg">
+                    <p className="text-sm font-medium text-gray-700">Banco</p>
+                    <p className="text-gray-900 font-semibold">{pixInfo.bank}</p>
+                  </div>
+                  <div className="bg-gray-50 p-3 rounded-lg">
+                    <p className="text-sm font-medium text-gray-700">Nome do Titular</p>
+                    <p className="text-gray-900 font-semibold">{pixInfo.name}</p>
+                  </div>
+                  <div className="bg-gray-50 p-3 rounded-lg">
+                    <p className="text-sm font-medium text-gray-700">CPF (Chave PIX)</p>
+                    <p className="text-gray-900 font-semibold font-mono">{pixInfo.cpf}</p>
+                  </div>
+                </div>
+                <button onClick={handleCopy} className="text-blue-600 mt-3 inline-flex items-center">
+                  {copied ? (
+                    <><Check className="w-4 h-4 mr-1" /> Copiado!</>
+                  ) : (
+                    <><Copy className="w-4 h-4 mr-1" /> Copiar Chave PIX</>
+                  )}
+                </button>
               </>
             ) : (
               <>
@@ -251,14 +275,17 @@ const Invest = () => {
                   readOnly
                   className="w-full p-2 border rounded mb-3"
                 />
+                <button onClick={handleCopy} className="text-blue-600 inline-flex items-center">
+                  {copied ? (
+                    <><Check className="w-4 h-4 mr-1" /> Copiado!</>
+                  ) : (
+                    <><Copy className="w-4 h-4 mr-1" /> Copiar Endereço</>
+                  )}
+                </button>
               </>
             )}
 
-            <button onClick={handleCopy} className="text-blue-600 mb-4">
-              {copied ? 'Copiado!' : 'Copiar'}
-            </button>
-
-            <p className="mb-4">
+            <p className="mt-4 mb-4">
               Valor: {formatCurrency(investmentAmount)}
             </p>
 
