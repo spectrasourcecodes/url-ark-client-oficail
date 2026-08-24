@@ -90,7 +90,7 @@ const Navbar = () => {
                 className="w-10 h-10 object-contain"
               />
               <div className="flex flex-col leading-tight">
-                <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 text-transparent bg-clip-text">
+                <span className="text-2xl font-bold bg-black text-transparent bg-clip-text">
                   ARK
                 </span>
                 <span className="text-xs text-gray-500 -mt-1">invest</span>
@@ -171,7 +171,7 @@ const Navbar = () => {
               className="w-8 h-8 object-contain"
             />
             <div className="flex flex-col leading-tight">
-              <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 text-transparent bg-clip-text">
+              <span className="text-xl font-bold bg-black text-transparent bg-clip-text">
                 ARK
               </span>
               <span className="text-[10px] text-gray-500 -mt-1">invest</span>
