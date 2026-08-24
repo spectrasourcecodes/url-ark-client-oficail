@@ -3,25 +3,15 @@ import React, { useState, useEffect } from 'react';
 import { 
   Users, 
   UserCheck, 
-  UserX, 
   DollarSign, 
-  TrendingUp, 
-  Activity,
   Shield,
-  Clock,
-  Calendar,
-  ArrowUpRight,
-  ArrowDownRight,
-  MoreHorizontal,
   RefreshCw,
   Mail,
-  Phone,
   Eye,
   Wallet,
-  BarChart3,
   PieChart,
   Zap,
-  Award
+  User
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
