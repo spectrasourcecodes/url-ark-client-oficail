@@ -160,15 +160,21 @@ const Withdraw = () => {
   ];
 
   // Fetch user and wallet data
+  // Fetch user and wallet data
   const fetchWithdrawData = async (showToast = false) => {
     try {
       if (showToast) setRefreshing(true);
-      
+
       const response = await axiosInstance.get('/api/user/dashboard');
       const { wallet: walletData } = response.data;
-      
+
       setWallet(walletData);
       setWithdrawals(mockWithdrawals);
+
+      // 🔹 Sync KYC state from the backend (source of truth: wallet.kyc)
+      if (typeof setKycStatus === 'function') {
+        setKycStatus(walletData?.kyc ? 'approved' : 'pending');
+      }
 
       if (showToast) {
         toast.success('Dados de saque atualizados');

@@ -1,5 +1,5 @@
 // src/context/AuthContext.jsx
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
 import axiosInstance from '../utils/axios';
 
 console.log('✅ AuthContext file loaded!');
@@ -14,25 +14,46 @@ export const useAuth = () => {
     return context;
 };
 
+// Map wallet.kyc (boolean) -> kycStatus (string used by the UI)
+const mapKyc = (walletKyc) => (walletKyc ? 'approved' : 'pending');
+
 export const AuthProvider = ({ children }) => {
     console.log('✅ AuthProvider rendering!');
-    
+
     const [user, setUser] = useState(null);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [loading, setLoading] = useState(true);
-    const [kycStatus, setKycStatus] = useState('pending'); // Added kycStatus state
+    const [kycStatus, setKycStatus] = useState('pending');
+
+    // 🔹 New: read the real KYC flag from the backend
+    const refreshKycStatus = useCallback(async () => {
+        try {
+            const { data } = await axiosInstance.get('/api/user/dashboard');
+            const walletKyc = data?.wallet?.kyc ?? false;
+            const status = mapKyc(walletKyc);
+            setKycStatus(status);
+            return status;
+        } catch (err) {
+            console.error('❌ Failed to refresh KYC status:', err);
+            // keep the current value on failure
+            return kycStatus;
+        }
+    }, [kycStatus]);
 
     useEffect(() => {
         console.log('✅ AuthProvider useEffect running!');
         const token = localStorage.getItem('token');
         const userData = localStorage.getItem('user');
-        
+
         if (token && userData) {
             try {
                 const parsedUser = JSON.parse(userData);
                 setUser(parsedUser);
                 setIsAuthenticated(true);
                 console.log('✅ User restored from localStorage:', parsedUser);
+
+                // 🔹 Fetch the real KYC status right away
+                refreshKycStatus();
             } catch (error) {
                 console.error('Error parsing user data:', error);
                 localStorage.removeItem('user');
@@ -40,27 +61,24 @@ export const AuthProvider = ({ children }) => {
             }
         }
         setLoading(false);
-    }, []);
+    }, [refreshKycStatus]);
 
     const login = async (email, password) => {
-        console.log('✅ Login function called!');
         try {
-            const { data } = await axiosInstance.post('/api/user/login', {
-                email,
-                password
-            });
-            
-            console.log('✅ Login response:', data);
+            const { data } = await axiosInstance.post('/api/user/login', { email, password });
 
             if (data.success) {
                 localStorage.setItem('token', data.token);
                 localStorage.setItem('user', JSON.stringify(data.user));
                 setUser(data.user);
                 setIsAuthenticated(true);
+
+                // 🔹 Sync KYC immediately after login
+                refreshKycStatus();
+
                 return { success: true, message: data.message };
-            } else {
-                return { success: false, message: data.message };
             }
+            return { success: false, message: data.message };
         } catch (error) {
             console.error('❌ Login error:', error);
             const message = error.response?.data?.message || 'Login failed';
@@ -69,21 +87,21 @@ export const AuthProvider = ({ children }) => {
     };
 
     const register = async (userData) => {
-        console.log('✅ Register function called!');
         try {
             const { data } = await axiosInstance.post('/api/user/register', userData);
-            
-            console.log('✅ Register response:', data);
 
             if (data.success) {
                 localStorage.setItem('token', data.token);
                 localStorage.setItem('user', JSON.stringify(data.user));
                 setUser(data.user);
                 setIsAuthenticated(true);
+
+                // 🔹 New accounts default to pending; still refresh to be safe
+                refreshKycStatus();
+
                 return { success: true, message: data.message };
-            } else {
-                return { success: false, message: data.message };
             }
+            return { success: false, message: data.message };
         } catch (error) {
             console.error('❌ Register error:', error);
             const message = error.response?.data?.message || 'Registration failed';
@@ -97,7 +115,7 @@ export const AuthProvider = ({ children }) => {
         localStorage.removeItem('user');
         setUser(null);
         setIsAuthenticated(false);
-        setKycStatus('pending'); // Reset KYC status on logout
+        setKycStatus('pending');
     };
 
     const value = {
@@ -105,7 +123,8 @@ export const AuthProvider = ({ children }) => {
         isAuthenticated,
         loading,
         kycStatus,
-        setKycStatus, // ← This is now exposed
+        setKycStatus,
+        refreshKycStatus, // 🔹 exposed so any page can re-sync
         login,
         register,
         logout,
