@@ -1,8 +1,8 @@
 // src/pages/Invest.jsx
 import React, { useState } from 'react';
 import {
-  TrendingUp, Clock, Award, X, Copy, Check,
-  Wallet, AlertCircle, RefreshCw, Shield
+  TrendingUp, Clock, Award, Copy, Check,
+  RefreshCw, Shield
 } from 'lucide-react';
 import { toast } from 'react-toastify';
 
@@ -18,8 +18,11 @@ const Invest = () => {
   // PIX details object – easy to update
   const pixInfo = {
     bank: 'Caixa Econômica Federal',
-    name: 'Michele Soraia Cordeiro Ferreira',
-    cpf: '13239524708',
+    name: 'Lisangela Pereira da Costa',
+    cpf: '00865643660',
+    agency: '3880',
+    account: '965891363-1',
+
     // The PIX key is the CPF (for this account)
     get pixKey() {
       return this.cpf;
@@ -249,6 +252,14 @@ const Invest = () => {
                   <div className="bg-gray-50 p-3 rounded-lg">
                     <p className="text-sm font-medium text-gray-700">Banco</p>
                     <p className="text-gray-900 font-semibold">{pixInfo.bank}</p>
+                  </div>
+                  <div className="bg-gray-50 p-3 rounded-lg">
+                    <p className="text-sm font-medium text-gray-700">Agência</p>
+                    <p className="text-gray-900 font-semibold">{pixInfo.agency}</p>
+                  </div>
+                  <div className="bg-gray-50 p-3 rounded-lg">
+                    <p className="text-sm font-medium text-gray-700">Conta</p>
+                    <p className="text-gray-900 font-semibold">{pixInfo.account}</p>
                   </div>
                   <div className="bg-gray-50 p-3 rounded-lg">
                     <p className="text-sm font-medium text-gray-700">Nome do Titular</p>
