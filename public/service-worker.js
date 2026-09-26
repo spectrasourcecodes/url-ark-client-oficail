@@ -10,42 +10,41 @@ const STATIC_ASSETS = [
   '/icons/icon-512x512.jpeg',
 ];
 
-// Install – cache core assets
-self.addEventListener('install', (event) => {
+self.addEventListener("install", (event) => {
+  console.log("SW Installed");
+
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(STATIC_ASSETS))
+    caches.open(CACHE_NAME)
+      .then(cache => cache.addAll(STATIC_ASSETS))
   );
+
   self.skipWaiting();
 });
 
-// Activate – clean old caches
-self.addEventListener('activate', (event) => {
+self.addEventListener("activate", (event) => {
+  console.log("SW Activated");
+
   event.waitUntil(
-    caches.keys().then((keys) =>
+    caches.keys().then(keys =>
       Promise.all(
         keys
-          .filter((key) => key !== CACHE_NAME)
-          .map((key) => caches.delete(key))
+          .filter(key => key !== CACHE_NAME)
+          .map(key => caches.delete(key))
       )
     )
   );
+
   self.clients.claim();
 });
 
-// Fetch – SPA + offline support
-self.addEventListener('fetch', (event) => {
-  // Handle React Router navigation
-  if (event.request.mode === 'navigate') {
-    event.respondWith(
-      fetch(event.request).catch(() => caches.match('/'))
-    );
-    return;
-  }
+self.addEventListener("fetch", (event) => {
+  if (event.request.method !== "GET") return;
 
-  // Cache-first for static assets
   event.respondWith(
-    caches.match(event.request).then(
-      (cached) => cached || fetch(event.request)
-    )
+    caches.match(event.request)
+      .then(cached => {
+        return cached || fetch(event.request);
+      })
+      .catch(() => caches.match("/"))
   );
 });
