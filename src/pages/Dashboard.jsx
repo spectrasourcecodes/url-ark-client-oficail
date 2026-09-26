@@ -41,7 +41,7 @@ const Dashboard = () => {
           totalProfit: data.wallet?.profitBalance || 0,
           totalDeposits: data.wallet?.totalDeposits || 0,
           totalWithdrawals: data.wallet?.totalWithdrawals || 0,
-          walletAddress: data.wallet?.walletAddress || '0x...',
+          walletAddress: data.wallet?._id,
           userId: { name: user?.fullName || 'User' },
         };
         setWallet(mappedWallet);

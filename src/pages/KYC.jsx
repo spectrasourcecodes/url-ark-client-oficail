@@ -389,7 +389,7 @@ const KYC = () => {
                   name="occupation"
                   value={formData.occupation}
                   onChange={handleChange}
-                  placeholder="Software Engineer"
+                  placeholder=""
                   className="w-full bg-slate-900 border border-slate-700 rounded-lg pl-10 pr-4 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 transition"
                 />
               </div>
