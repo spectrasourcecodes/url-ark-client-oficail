@@ -1,7 +1,7 @@
-export const SITE_NAME = "Ark Investment";
+export const SITE_NAME = "Ark Invest";
 export const ADMIN_EMAIL = "support@ark.com";
 export const ADMIN_WHATSAPP = "+856484639";
-export const ADMIN_TELEGRAM = "#";
+export const ADMIN_TELEGRAM = "https://t.me/ArkInvestSupportTearm";
 
 export const mockUser = {
   id: "USR8781",
