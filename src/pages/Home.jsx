@@ -5,6 +5,7 @@ import {
   FaShieldAlt, FaChartLine, FaBolt, FaEye, FaTag, FaHeadset, 
   FaPercent, FaCoins, FaMicrochip, FaRocket 
 } from 'react-icons/fa';
+import GoogleTranslate from '../components/GoogleTranslate';
 import { SITE_NAME, ADMIN_EMAIL, ADMIN_WHATSAPP, ADMIN_TELEGRAM, mockInvestmentPlans, mockForexPairs } from '../data/mockData';
 import LoadingScreen from '../components/LoadingScreen';
 import AnimatedCounter from '../components/AnimatedCounter';
@@ -27,6 +28,7 @@ const Header = () => (
             <span className="text-slate-300">24/7 Support</span>
           </div>
         </div>
+        <GoogleTranslate />
       </div>
     </div>
   </div>
@@ -61,8 +63,9 @@ const NavbarHome = () => (
   </nav>
 );
 
-// ✅ Hero image URL — file must be at public/images/ark-hero.jpeg
-const HERO_IMAGE_URL = '/images/ark-hero.jpeg';
+// ✅ Hero image URL — replace with your own image
+const HERO_IMAGE_URL =
+  '/images/ark-hero.jpeg';
 
 const Hero = () => (
   <div className="relative pt-20 pb-32 overflow-hidden">
@@ -75,6 +78,7 @@ const Hero = () => (
 
     <div className="container mx-auto px-4 relative z-10">
       <div className="flex flex-col lg:flex-row items-center gap-12">
+        {/* ─── Left: Text ─────────────────────────────────── */}
         <motion.div
           initial={{ opacity: 0, x: -50 }}
           animate={{ opacity: 1, x: 0 }}
@@ -105,6 +109,7 @@ const Hero = () => (
           </div>
         </motion.div>
 
+        {/* ─── Right: Hero Image ──────────────────────────── */}
         <motion.div
           initial={{ opacity: 0, x: 50 }}
           animate={{ opacity: 1, x: 0 }}
@@ -119,6 +124,7 @@ const Hero = () => (
               loading="eager"
             />
 
+            {/* Top-right live badge */}
             <div className="absolute top-4 right-4 flex items-center gap-2 bg-slate-900/70 backdrop-blur-md border border-slate-700 rounded-full px-3 py-1.5">
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
