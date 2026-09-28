@@ -63,6 +63,10 @@ const NavbarHome = () => (
   </nav>
 );
 
+// ✅ Hero image URL — replace with your own image
+const HERO_IMAGE_URL =
+  '../assets/Ark-hero.jpeg';
+
 const Hero = () => (
   <div className="relative pt-20 pb-32 overflow-hidden">
     <div className="absolute inset-0 bg-gradient-to-b from-slate-900 to-slate-800 opacity-90"></div>
@@ -71,77 +75,111 @@ const Hero = () => (
       <div className="absolute top-40 right-40 w-80 h-80 bg-indigo-500 rounded-full mix-blend-lighten filter blur-3xl opacity-70 animate-blob animation-delay-2000"></div>
       <div className="absolute top-10 left-40 w-72 h-72 bg-cyan-500 rounded-full mix-blend-lighten filter blur-3xl opacity-70 animate-blob animation-delay-4000"></div>
     </div>
-    
+
     <div className="container mx-auto px-4 relative z-10">
-      <div className="flex flex-col lg:flex-row items-center">
-        <motion.div 
+      <div className="flex flex-col lg:flex-row items-center gap-12">
+        {/* ─── Left: Text ─────────────────────────────────── */}
+        <motion.div
           initial={{ opacity: 0, x: -50 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.8 }}
-          className="lg:w-1/2 mb-12 lg:mb-0"
+          className="lg:w-1/2 w-full"
         >
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6">
-            Trade Forex & Crypto with <span className="gradient-text">Professional Excellence</span>
+            Trade Forex & Crypto with{' '}
+            <span className="gradient-text">Professional Excellence</span>
           </h1>
           <p className="text-lg text-slate-300 mb-8 max-w-2xl">
-            Join 25,000+ traders who trust us with their investments. Experience premium trading conditions, instant withdrawals, and 24/7 dedicated support.
+            Join 25,000+ traders who trust us with their investments. Experience premium trading
+            conditions, instant withdrawals, and 24/7 dedicated support.
           </p>
           <div className="flex flex-wrap gap-4">
-            <Link to="/register" className="px-8 py-4 rounded-lg gradient-bg text-white font-bold text-lg hover:opacity-90 transition transform hover:scale-105">
+            <Link
+              to="/register"
+              className="px-8 py-4 rounded-lg gradient-bg text-white font-bold text-lg hover:opacity-90 transition transform hover:scale-105"
+            >
               Get Started
             </Link>
-            <Link to="/plans" className="px-8 py-4 rounded-lg bg-slate-700 text-white font-bold text-lg hover:bg-slate-600 transition transform hover:scale-105">
+            <Link
+              to="/plans"
+              className="px-8 py-4 rounded-lg bg-slate-700 text-white font-bold text-lg hover:bg-slate-600 transition transform hover:scale-105"
+            >
               View Plans
             </Link>
           </div>
         </motion.div>
-        
-        <motion.div 
+
+        {/* ─── Right: Hero Image + Market Card overlay ────── */}
+        <motion.div
           initial={{ opacity: 0, x: 50 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.8 }}
-          className="lg:w-1/2 flex justify-center"
+          className="lg:w-1/2 w-full"
         >
-          <div className="relative">
-            <div className="relative bg-gradient-to-br from-blue-500/20 to-indigo-600/20 rounded-2xl p-1 backdrop-blur-sm glow-effect">
-              <div className="bg-slate-800/80 rounded-xl p-6">
-                <div className="flex justify-between items-center mb-6">
+          <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-slate-700">
+            {/* ✅ Clearly visible hero image */}
+            <img
+              src={HERO_IMAGE_URL}
+              alt="Professional trading dashboard and market analysis"
+              className="w-full h-[380px] sm:h-[440px] lg:h-[520px] object-cover"
+              loading="eager"
+            />
+
+            {/* Subtle gradient at the bottom for readability */}
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-900/95 via-slate-900/10 to-transparent pointer-events-none"></div>
+
+            {/* Top-right live badge */}
+            <div className="absolute top-4 right-4 flex items-center gap-2 bg-slate-900/70 backdrop-blur-md border border-slate-700 rounded-full px-3 py-1.5">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+              </span>
+              <span className="text-xs font-semibold text-white">LIVE</span>
+            </div>
+
+            {/* Market data card floating at the bottom */}
+            <div className="absolute bottom-4 left-4 right-4">
+              <div className="bg-slate-800/90 backdrop-blur-xl rounded-xl p-4 border border-slate-700 shadow-2xl">
+                <div className="flex justify-between items-center mb-3">
                   <div>
-                    <h3 className="text-xl font-bold text-white">Live Market Data</h3>
-                    <p className="text-slate-400">Real-time updates</p>
+                    <h3 className="text-sm font-bold text-white">Live Market Data</h3>
+                    <p className="text-xs text-slate-400">Real-time updates</p>
                   </div>
-                  <div className="flex space-x-2">
-                    <div className="w-3 h-3 bg-red-400 rounded-full"></div>
-                    <div className="w-3 h-3 bg-yellow-400 rounded-full"></div>
-                    <div className="w-3 h-3 bg-green-400 rounded-full"></div>
+                  <div className="flex space-x-1.5">
+                    <div className="w-2 h-2 bg-red-400 rounded-full"></div>
+                    <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
+                    <div className="w-2 h-2 bg-green-400 rounded-full"></div>
                   </div>
                 </div>
-                
-                <div className="grid grid-cols-2 gap-4">
+
+                <div className="grid grid-cols-2 gap-2">
                   {mockForexPairs.slice(0, 4).map((item, index) => (
-                    <motion.div 
+                    <motion.div
                       key={index}
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: index * 0.1 }}
-                      className="bg-slate-700 rounded-lg p-3"
+                      className="bg-slate-700/70 rounded-lg p-2"
                     >
-                      <div className="text-slate-400 text-sm">{item.pair}</div>
-                      <div className="text-white font-bold">{item.price}</div>
-                      <div className={`${item.change >= 0 ? 'text-green-500' : 'text-red-500'} text-xs`}>
-                        {item.change >= 0 ? '+' : ''}{item.change}%
+                      <div className="text-slate-400 text-xs">{item.pair}</div>
+                      <div className="text-white font-bold text-sm">{item.price}</div>
+                      <div
+                        className={`${
+                          item.change >= 0 ? 'text-green-500' : 'text-red-500'
+                        } text-xs`}
+                      >
+                        {item.change >= 0 ? '+' : ''}
+                        {item.change}%
                       </div>
                     </motion.div>
                   ))}
                 </div>
-                
-                <div className="mt-4 h-32 bg-gradient-to-r from-blue-900/30 to-indigo-900/30 rounded-lg flex items-center justify-center">
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-white mb-2">
-                      <AnimatedCounter end={42.7} suffix="%" />
-                    </div>
-                    <div className="text-slate-400">Average Portfolio Growth</div>
-                  </div>
+
+                <div className="mt-3 pt-3 border-t border-slate-700 flex items-center justify-between">
+                  <span className="text-xs text-slate-400">Avg. Portfolio Growth</span>
+                  <span className="text-sm font-bold text-green-400">
+                    <AnimatedCounter end={42.7} suffix="%" />
+                  </span>
                 </div>
               </div>
             </div>
