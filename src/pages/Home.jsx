@@ -42,7 +42,7 @@ const NavbarHome = () => (
         <Link to="/" className="flex items-center gap-3 group">
           {/* PWA icon */}
           <img
-            src="/icons/icon-192x192.png"
+            src="/icons/icon-192x192.jpeg"
             alt="Ark Invest"
             className="w-10 h-10 rounded-lg shadow-md group-hover:scale-105 transition-transform duration-200"
           />
