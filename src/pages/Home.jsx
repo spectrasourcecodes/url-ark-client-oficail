@@ -109,7 +109,7 @@ const Hero = () => (
           </div>
         </motion.div>
 
-        {/* ─── Right: Hero Image + Market Card overlay ────── */}
+        {/* ─── Right: Hero Image ──────────────────────────── */}
         <motion.div
           initial={{ opacity: 0, x: 50 }}
           animate={{ opacity: 1, x: 0 }}
@@ -117,16 +117,12 @@ const Hero = () => (
           className="lg:w-1/2 w-full"
         >
           <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-slate-700">
-            {/* ✅ Clearly visible hero image */}
             <img
               src={HERO_IMAGE_URL}
               alt="Professional trading dashboard and market analysis"
               className="w-full h-[380px] sm:h-[440px] lg:h-[520px] object-cover"
               loading="eager"
             />
-
-            {/* Subtle gradient at the bottom for readability */}
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-900/95 via-slate-900/10 to-transparent pointer-events-none"></div>
 
             {/* Top-right live badge */}
             <div className="absolute top-4 right-4 flex items-center gap-2 bg-slate-900/70 backdrop-blur-md border border-slate-700 rounded-full px-3 py-1.5">
@@ -135,53 +131,6 @@ const Hero = () => (
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
               </span>
               <span className="text-xs font-semibold text-white">LIVE</span>
-            </div>
-
-            {/* Market data card floating at the bottom */}
-            <div className="absolute bottom-4 left-4 right-4">
-              <div className="bg-slate-800/90 backdrop-blur-xl rounded-xl p-4 border border-slate-700 shadow-2xl">
-                <div className="flex justify-between items-center mb-3">
-                  <div>
-                    <h3 className="text-sm font-bold text-white">Live Market Data</h3>
-                    <p className="text-xs text-slate-400">Real-time updates</p>
-                  </div>
-                  <div className="flex space-x-1.5">
-                    <div className="w-2 h-2 bg-red-400 rounded-full"></div>
-                    <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
-                    <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-2">
-                  {mockForexPairs.slice(0, 4).map((item, index) => (
-                    <motion.div
-                      key={index}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.1 }}
-                      className="bg-slate-700/70 rounded-lg p-2"
-                    >
-                      <div className="text-slate-400 text-xs">{item.pair}</div>
-                      <div className="text-white font-bold text-sm">{item.price}</div>
-                      <div
-                        className={`${
-                          item.change >= 0 ? 'text-green-500' : 'text-red-500'
-                        } text-xs`}
-                      >
-                        {item.change >= 0 ? '+' : ''}
-                        {item.change}%
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-
-                <div className="mt-3 pt-3 border-t border-slate-700 flex items-center justify-between">
-                  <span className="text-xs text-slate-400">Avg. Portfolio Growth</span>
-                  <span className="text-sm font-bold text-green-400">
-                    <AnimatedCounter end={42.7} suffix="%" />
-                  </span>
-                </div>
-              </div>
             </div>
           </div>
         </motion.div>
