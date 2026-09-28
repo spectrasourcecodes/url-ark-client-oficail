@@ -109,7 +109,7 @@ const Navbar = () => {
   const displayBalance = loading ? '...' : `${currencySymbol}${wallet.totalBalance?.toLocaleString() || '0.00'}`;
 
   const openLiveChat = () => {
-    window.open('https://chat-support1.onrender.com', '_blank', 'width=400,height=600,scrollbars=yes');
+    window.open('', '_blank', 'width=400,height=600,scrollbars=yes');
   };
 
   return (
@@ -129,7 +129,7 @@ const Navbar = () => {
             <Link to="/" className="flex items-center gap-2 group min-w-[120px]">
               {/* JPEG logo */}
               <img
-                src="/images/ark-logo.jpeg"
+                src="/icons/icon-192x192.jpeg"
                 alt="Ark Invest"
                 className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg object-cover shadow-sm group-hover:scale-105 transition-transform duration-200"
                 onError={(e) => {
