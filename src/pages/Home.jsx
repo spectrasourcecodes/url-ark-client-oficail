@@ -65,7 +65,7 @@ const NavbarHome = () => (
 
 // ✅ Hero image URL — replace with your own image
 const HERO_IMAGE_URL =
-  '../assets/Ark-hero.jpeg';
+  '/images/ark-hero.jpeg';
 
 const Hero = () => (
   <div className="relative pt-20 pb-32 overflow-hidden">
