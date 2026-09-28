@@ -9,7 +9,7 @@ import {
 import { HiMenu, HiX } from 'react-icons/hi';
 import Modal from 'react-modal';
 import GoogleTranslate from './GoogleTranslate';
-import { SITE_NAME, ADMIN_WHATSAPP, ADMIN_TELEGRAM } from '../data/mockData';
+import { ADMIN_WHATSAPP, ADMIN_TELEGRAM } from '../data/mockData';
 import API from '../utils/axios';
 import { useAuth } from '../auth/userAuth';
 import { getCurrencySymbol } from '../utils/currency';
@@ -114,20 +114,38 @@ const Navbar = () => {
 
   return (
     <>
-      {/* Top Bar – fixed height */}
-      <div className="fixed top-0 left-0 right-0 bg-gradient-to-r from-blue-800 to-indigo-900 shadow-lg z-40 h-16 flex items-center">
+      {/* Top Bar – fixed height (white background) */}
+      <div className="fixed top-0 left-0 right-0 bg-white shadow-md border-b border-slate-200 z-40 h-16 flex items-center">
         <div className="container mx-auto px-3 sm:px-4 flex items-center justify-between w-full">
           {/* Left section - Hamburger + Logo */}
           <div className="flex items-center gap-3">
             <button 
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="lg:hidden text-white p-2 hover:bg-white/10 rounded-lg transition"
+              className="lg:hidden text-slate-700 p-2 hover:bg-slate-100 rounded-lg transition"
             >
               {isMobileMenuOpen ? <HiX size={24} /> : <HiMenu size={24} />}
             </button>
             
-            <Link to="/" className="flex items-center min-w-[120px]">
-              <h2 className="text-lg sm:text-xl font-bold text-white">{SITE_NAME}</h2>
+            <Link to="/" className="flex items-center gap-2 group min-w-[120px]">
+              {/* JPEG logo */}
+              <img
+                src="/images/ark-logo.jpeg"
+                alt="Ark Invest"
+                className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg object-cover shadow-sm group-hover:scale-105 transition-transform duration-200"
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                }}
+              />
+
+              {/* Stacked logo text */}
+              <div className="flex flex-col leading-none">
+                <span className="text-lg sm:text-xl font-extrabold text-slate-900 tracking-tight">
+                  ARK
+                </span>
+                <span className="text-[10px] sm:text-[11px] font-medium text-slate-500 tracking-widest lowercase">
+                  invest
+                </span>
+              </div>
             </Link>
           </div>
           
@@ -135,7 +153,7 @@ const Navbar = () => {
           <div className="flex items-center gap-2 sm:gap-3">
             <button 
               onClick={() => setIsSupportOpen(true)}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg flex items-center transition text-sm"
+              className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg flex items-center transition text-sm shadow-sm"
             >
               <FaHeadset className="mr-1 sm:mr-2 text-sm sm:text-base" />
               <span className="hidden xs:inline">Support</span>
@@ -145,7 +163,7 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Desktop Sidebar */}
+      {/* Desktop Sidebar (unchanged – keeps dark theme) */}
       <aside className="hidden lg:block fixed left-0 top-16 bottom-0 w-64 bg-slate-900 border-r border-slate-800 overflow-y-auto z-30">
         <div className="p-4">
           <div className="mb-8 p-4 bg-gradient-to-br from-blue-600/20 to-purple-600/20 rounded-2xl">
