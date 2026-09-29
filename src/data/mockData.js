@@ -1,7 +1,7 @@
 export const SITE_NAME = "Ark Invest";
-export const ADMIN_EMAIL = "support@ark.com";
+export const ADMIN_EMAIL = "support@arkinvest.com";
 export const ADMIN_WHATSAPP = "+856484639";
-export const ADMIN_TELEGRAM = "https://t.me/ArkInvestSupportTearm";
+export const ADMIN_TELEGRAM = "#";
 
 export const mockUser = {
   id: "USR8781",
@@ -45,13 +45,13 @@ export const mockForexPairs = [
   { pair: "NZD/USD", price: 0.6120, change: -0.03, spread: 0.0001 }
 ];
 
-// Ark-themed investment plans.
+// Tesla-themed investment plans.
 // Field names are unchanged so existing components (Home, /plans, dashboard)
 // continue to work without modification.
 export const mockInvestmentPlans = [
   {
     id: 1,
-    name: "Ark Starter",
+    name: "Tesla Starter",
     minAmount: 300,
     maxAmount: 1000,
     roi: 12,
@@ -63,7 +63,7 @@ export const mockInvestmentPlans = [
   },
   {
     id: 2,
-    name: "Ark Growth",
+    name: "Tesla Growth",
     minAmount: 1000,
     maxAmount: 5000,
     roi: 18,
@@ -75,7 +75,7 @@ export const mockInvestmentPlans = [
   },
   {
     id: 3,
-    name: "Ark Innovation",
+    name: "Tesla Innovation",
     minAmount: 5000,
     maxAmount: 15000,
     roi: 24,
@@ -87,7 +87,7 @@ export const mockInvestmentPlans = [
   },
   {
     id: 4,
-    name: "Ark Energy",
+    name: "Tesla Energy",
     minAmount: 15000,
     maxAmount: 50000,
     roi: 32,
@@ -99,7 +99,7 @@ export const mockInvestmentPlans = [
   },
   {
     id: 5,
-    name: "Ark Robotics",
+    name: "Tesla Robotics",
     minAmount: 50000,
     maxAmount: 150000,
     roi: 40,
@@ -111,7 +111,7 @@ export const mockInvestmentPlans = [
   },
   {
     id: 6,
-    name: "Ark Future",
+    name: "Tesla Future",
     minAmount: 150000,
     maxAmount: null,
     roi: 50,
@@ -125,18 +125,18 @@ export const mockInvestmentPlans = [
 
 export const mockTransactions = [
   // { id: "TX001", type: "deposit", amount: 5000, currency: "USD", status: "completed", date: "2024-01-15T10:30:00", method: "Bank Transfer" },
-  // { id: "TX002", type: "investment", amount: 3000, currency: "USD", status: "completed", date: "2024-01-16T14:20:00", plan: "Ark Innovation" },
-  // { id: "TX003", type: "profit", amount: 540, currency: "USD", status: "completed", date: "2024-01-20T09:15:00", plan: "Ark Innovation" },
+  // { id: "TX002", type: "investment", amount: 3000, currency: "USD", status: "completed", date: "2024-01-16T14:20:00", plan: "Tesla Innovation" },
+  // { id: "TX003", type: "profit", amount: 540, currency: "USD", status: "completed", date: "2024-01-20T09:15:00", plan: "Tesla Innovation" },
   // { id: "TX004", type: "withdraw", amount: 2000, currency: "USD", status: "pending", date: "2024-01-22T16:45:00", method: "USDT (TRC20)" },
   // { id: "TX005", type: "deposit", amount: 2500, currency: "USD", status: "completed", date: "2024-01-10T11:00:00", method: "Credit Card" },
-  // { id: "TX006", type: "investment", amount: 5000, currency: "USD", status: "completed", date: "2024-01-12T13:30:00", plan: "Ark Energy" },
-  // { id: "TX007", type: "profit", amount: 1600, currency: "USD", status: "completed", date: "2024-01-18T10:00:00", plan: "Ark Energy" },
+  // { id: "TX006", type: "investment", amount: 5000, currency: "USD", status: "completed", date: "2024-01-12T13:30:00", plan: "Tesla Energy" },
+  // { id: "TX007", type: "profit", amount: 1600, currency: "USD", status: "completed", date: "2024-01-18T10:00:00", plan: "Tesla Energy" },
   // { id: "TX008", type: "referral", amount: 250, currency: "USD", status: "completed", date: "2024-01-19T08:30:00", from: "Sarah Johnson" }
 ];
 
 export const mockActiveInvestments = [
-  // { id: "INV001", plan: "Ark Innovation", amount: 3000, startDate: "2024-01-16", endDate: "2024-03-16", profit: 540, status: "active", roi: 18 },
-  // { id: "INV002", plan: "Ark Energy", amount: 5000, startDate: "2024-01-12", endDate: "2024-04-12", profit: 1600, status: "active", roi: 32 }
+  // { id: "INV001", plan: "Tesla Innovation", amount: 3000, startDate: "2024-01-16", endDate: "2024-03-16", profit: 540, status: "active", roi: 18 },
+  // { id: "INV002", plan: "Tesla Energy", amount: 5000, startDate: "2024-01-12", endDate: "2024-04-12", profit: 1600, status: "active", roi: 32 }
 ];
 
 export const mockReferrals = [
@@ -147,18 +147,18 @@ export const mockReferrals = [
 ];
 
 export const mockNotifications = [
-  // { id: 1, title: "Investment Profit Credited", message: "You've received $540 profit from your Ark Innovation plan", time: "2 hours ago", read: false, type: "profit" },
+  // { id: 1, title: "Investment Profit Credited", message: "You've received $540 profit from your Tesla Innovation plan", time: "2 hours ago", read: false, type: "profit" },
   // { id: 2, title: "Deposit Confirmed", message: "Your deposit of $5,000 has been confirmed", time: "1 day ago", read: false, type: "deposit" },
   // { id: 3, title: "Welcome Bonus", message: "Congratulations! You've received a $50 welcome bonus", time: "2 days ago", read: true, type: "bonus" },
   // { id: 4, title: "Security Alert", message: "New login detected from Chrome browser", time: "3 days ago", read: true, type: "security" }
 ];
 
 export const mockLivePayouts = [
-  // { id: 1, user: "User***123", amount: 1250, plan: "Ark Energy", time: "Just now" },
-  // { id: 2, user: "Trader***456", amount: 850, plan: "Ark Innovation", time: "2 minutes ago" },
-  // { id: 3, user: "Crypto***789", amount: 3200, plan: "Ark Robotics", time: "5 minutes ago" },
-  // { id: 4, user: "Invest***234", amount: 500, plan: "Ark Growth", time: "8 minutes ago" },
-  // { id: 5, user: "Wealth***567", amount: 2100, plan: "Ark Future", time: "12 minutes ago" }
+  // { id: 1, user: "User***123", amount: 1250, plan: "Tesla Energy", time: "Just now" },
+  // { id: 2, user: "Trader***456", amount: 850, plan: "Tesla Innovation", time: "2 minutes ago" },
+  // { id: 3, user: "Crypto***789", amount: 3200, plan: "Tesla Robotics", time: "5 minutes ago" },
+  // { id: 4, user: "Invest***234", amount: 500, plan: "Tesla Growth", time: "8 minutes ago" },
+  // { id: 5, user: "Wealth***567", amount: 2100, plan: "Tesla Future", time: "12 minutes ago" }
 ];
 
 export const mockSupportTickets = [

@@ -40,13 +40,9 @@ import AdminKYCManagement from './pages/admin/AdminKYCManagement';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminRoute from './components/AdminRoute';
 
-import InstallPrompt from './components/InstallPrompt';
-
-
 function App() {
   return (
     <Router>
-<InstallPrompt />
       <Toaster 
         position="top-right"
         toastOptions={{
@@ -58,7 +54,6 @@ function App() {
           },
         }}
       />
-
       <Routes>
         {/* Public Routes */}
         <Route path="/" element={<Home />} />
